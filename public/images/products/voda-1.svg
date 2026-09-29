@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Водное снаряжение — плейсхолдер">
+  <defs>
+    <linearGradient id="ph-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6f7f9" />
+      <stop offset="100%" stop-color="#e7eaef" />
+    </linearGradient>
+    <radialGradient id="ph-glow" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#f97316" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#ph-bg)" />
+  <rect width="800" height="600" fill="url(#ph-glow)" />
+  <rect x="14" y="14" width="772" height="572" rx="22" fill="none" stroke="#1e2430" stroke-opacity="0.1" stroke-width="2" />
+  
+  <g font-family="'Segoe UI', Roboto, Arial, sans-serif">
+    <text x="40" y="66" font-size="26" font-weight="700" fill="#1e2430">Garage19</text>
+    <text x="40" y="98" font-size="17" fill="#6b7280">Водное снаряжение</text>
+    <text x="760" y="66" text-anchor="end" font-size="17" font-weight="600" fill="#f97316">каяк / SUP</text>
+  </g>
+  
+    <path d="M130 400 C260 330 540 330 670 400 C540 470 260 470 130 400 Z" fill="#1e2430" fill-opacity="0.9" />
+    <path d="M210 400 C300 356 500 356 590 400 C500 444 300 444 210 400 Z" fill="#f97316" />
+    <g fill="#1e2430">
+      <rect x="366" y="252" width="18" height="126" rx="9" />
+      <rect x="322" y="248" width="106" height="22" rx="11" />
+    </g>
+    <g stroke="#1e2430" stroke-width="7" stroke-linecap="round" stroke-opacity="0.65">
+      <path d="M240 442 q40 26 80 0 M480 442 q40 26 80 0" fill="none" />
+    </g>
+  
+  <line x1="90" y1="472" x2="710" y2="472" stroke="#1e2430" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round" />
+  <g font-family="'Segoe UI', Roboto, Arial, sans-serif">
+    <text x="400" y="540" text-anchor="middle" font-size="20" fill="#1e2430" fill-opacity="0.55">Изображение-плейсхолдер · фото добавляется в админке</text>
+  </g>
+</svg>

@@ -1,0 +1,799 @@
+// Garage19 — схема базы данных интернет-магазина.
+// Проект: багажники на крышу, автобоксы, велокрепления, лыжные крепления, фаркопы (ТСУ).
+// Подбор товара: марка → модель → поколение → модификация (опционально).
+//
+// Договорённости команды (важно при доработках):
+//  * Все денежные значения — целые числа в КОПЕЙКАХ (Int): price = 499000 → 4 990,00 ₽.
+//  * Все веса — в граммах (Int), габариты — в миллиметрах (Int).
+//  * Статусы/типы хранятся строками (String) с константами в src/lib/constants.ts —
+//    так схема не зависит от диалекта SQL и легко расширяется.
+//  * Все id — cuid-строки. Даты создания — createdAt/updatedAt.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Пользователи, доступ, сессии
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         String   @default("customer") // customer | manager | admin
+  isActive     Boolean  @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  cityId    String?
+  city      City?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  sessions  Session[]
+  addresses Address[]
+  orders    Order[]
+  reviews   Review[]
+  cartItems CartItem[]
+  savedCars SavedCar[]
+  importJobs ImportJob[]
+  auditLogs AuditLog[]
+
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  email     String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String   @default("Адрес")
+  cityId    String?
+  city      City?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  street    String
+  comment   String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String // create | update | delete | login | import | status_change
+  entity    String // product | order | category | ...
+  entityId  String?
+  payload   Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Автомобили: марка → модель → поколение → модификация
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logo      String?
+  country   String?
+  popular   Boolean  @default(false)
+  sortOrder Int      @default(100)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  models    CarModel[]
+  products  Product[]  @relation("ProductManufacturer")
+  fitments  Fitment[]
+  savedCars SavedCar[]
+
+  @@index([isActive, sortOrder])
+}
+
+model CarModel {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String
+  bodyType  String?
+  yearFrom  Int?
+  yearTo    Int?
+  sortOrder Int      @default(100)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  generations Generation[]
+  fitments    Fitment[]
+  savedCars   SavedCar[]
+
+  @@unique([brandId, slug])
+  @@index([brandId, isActive])
+}
+
+model Generation {
+  id        String   @id @default(cuid())
+  modelId   String
+  model     CarModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String
+  yearFrom  Int
+  yearTo    Int?
+  bodyType  String?
+  imageUrl  String?
+  note      String?
+  sortOrder Int      @default(100)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  modifications Modification[]
+  fitments      Fitment[]
+  savedCars     SavedCar[]
+
+  @@unique([modelId, slug])
+  @@index([modelId, isActive])
+}
+
+model Modification {
+  id            String     @id @default(cuid())
+  generationId  String
+  generation    Generation @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  name          String
+  engine        String?
+  volume        Float?
+  power         Int?
+  fuel          String?
+  drive         String?
+  transmission  String?
+  bodyType      String?
+  yearFrom      Int?
+  yearTo        Int?
+  sortOrder     Int        @default(100)
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  fitments Fitment[]
+  savedCars SavedCar[]
+
+  @@index([generationId, isActive])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Каталог
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Category {
+  id             String     @id @default(cuid())
+  name           String
+  slug           String     @unique
+  parentId       String?
+  parent         Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Category[] @relation("CategoryTree")
+  description    String?
+  image          String?
+  icon           String?
+  sortOrder      Int        @default(100)
+  isActive       Boolean    @default(true)
+  showInMenu     Boolean    @default(true)
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  products   Product[]
+  attributes Attribute[]
+
+  @@index([parentId, isActive, sortOrder])
+}
+
+model Attribute {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type         String   @default("select") // select | number | bool | text
+  unit         String?
+  options      Json? // ["Алюминий", "Сталь"]
+  isFilterable Boolean  @default(true)
+  isRequired   Boolean  @default(false)
+  group        String?
+  sortOrder    Int      @default(100)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  values ProductAttribute[]
+
+  @@index([categoryId, isActive, sortOrder])
+}
+
+model Supplier {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  contactPerson String?
+  phone         String?
+  email         String?
+  priceUrl      String?
+  feedType      String? // xml | yml | csv
+  marginPercent Float    @default(0)
+  note          String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  products   Product[]
+  importJobs ImportJob[]
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  sku              String?  @unique
+  slug             String   @unique
+  name             String
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  manufacturerId   String?
+  manufacturer     Brand?   @relation("ProductManufacturer", fields: [manufacturerId], references: [id], onDelete: SetNull)
+  brandName        String? // текстовое имя бренда (Thule, Atera, Menabo...), если нет в справочнике марок авто
+
+  shortDescription String?
+  description      String?
+  warrantyMonths   Int?
+
+  // Цены в копейках
+  price            Int
+  oldPrice         Int?
+  purchasePrice    Int?
+
+  stock            Int      @default(0)
+  reserved         Int      @default(0)
+  unit             String   @default("шт")
+
+  // Габариты и вес
+  weight           Int? // граммы
+  lengthMm         Int?
+  widthMm          Int?
+  heightMm         Int?
+
+  // Совместимость
+  fitmentType      String   @default("specific") // specific | universal
+  fitmentNote      String?
+
+  // ── Ключевые характеристики для фасетного фильтра ──────────────────────────
+  // (вынесены в колонки: по ним строятся фильтры каталога и сравнение)
+  capacityKg       Int? // грузоподъёмность багажника / тяговая нагрузка ТСУ, кг
+  verticalLoadKg   Int? // вертикальная нагрузка на шар, кг
+  volumeL          Int? // объём автобокса, л
+  material         String? // алюминий | сталь | ABS-пластик
+  mountPlace       String? // рейлинги | штатные места | гладкая крыша | фаркоп | задняя дверь | водосточный желоб
+  profile          String? // WingBar | прямоугольный | аэродинамический
+  doorsCount       Int? // количество дверей (велокрепления на заднюю дверь)
+  lockIncluded     Boolean? // замок в комплекте
+  bumperCut        Boolean? // требуется вырез бампера (ТСУ)
+  electricIncluded Boolean? // электрика в комплекте (ТСУ)
+  rentAvailable    Boolean @default(false) // доступна аренда (автобоксы/багажники)
+
+  isActive         Boolean  @default(true)
+  isFeatured       Boolean  @default(false)
+  isHit            Boolean  @default(false)
+  isNew            Boolean  @default(false)
+  sortOrder        Int      @default(100)
+
+  ratingAvg        Float    @default(0)
+  ratingCount      Int      @default(0)
+  salesCount       Int      @default(0)
+  viewsCount       Int      @default(0)
+
+  seoTitle         String?
+  seoDescription   String?
+  seoKeywords      String?
+
+  supplierId       String?
+  supplier         Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  externalId       String? // id товара у поставщика
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  images        ProductImage[]
+  attributes    ProductAttribute[]
+  fitments      Fitment[]
+  relationsFrom ProductRelation[] @relation("RelationSource")
+  relationsTo   ProductRelation[] @relation("RelationTarget")
+  reviews       Review[]
+  questions     ProductQuestion[]
+  documents     ProductDocument[]
+  orderItems    OrderItem[]
+  cartItems     CartItem[]
+  callbacks     CallbackRequest[]
+
+  @@index([categoryId, isActive])
+  @@index([isActive, isFeatured])
+  @@index([isActive, isHit])
+  @@index([price])
+  @@index([fitmentType])
+  @@index([capacityKg])
+  @@index([mountPlace])
+  @@index([supplierId, externalId])
+}
+
+/// PDF-документы товара: инструкция, паспорт, сертификат соответствия.
+/// Для фаркопов (ТСУ) паспорт и сертификат обязательны для регистрации в ГИБДД.
+model ProductDocument {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type      String   @default("instruction") // instruction | passport | certificate | manual | other
+  title     String
+  url       String
+  fileSize  Int?
+  sortOrder Int      @default(100)
+  createdAt DateTime @default(now())
+
+  @@index([productId, type])
+}
+
+/// Вопрос-ответ в карточке товара. Публичный контент + SEO, отвечает менеджер.
+model ProductQuestion {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  authorName String
+  email      String?
+  question   String
+  answer     String?
+  answeredBy String?
+  answeredAt DateTime?
+  status     String   @default("pending") // pending | published | rejected
+  isPinned   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([productId, status])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(100)
+  isPrimary Boolean @default(false)
+
+  @@index([productId, sortOrder])
+}
+
+model ProductAttribute {
+  id            String    @id @default(cuid())
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributeId   String
+  attribute     Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  valueString   String?
+  valueNumber   Float?
+  valueBool     Boolean?
+
+  @@unique([productId, attributeId])
+  @@index([attributeId])
+}
+
+/// Совместимость товара с автомобилем. Уровень детализации — от марки до модификации.
+model Fitment {
+  id             String        @id @default(cuid())
+  productId      String
+  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  brandId        String
+  brand          Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  modelId        String?
+  model          CarModel?     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  generationId   String?
+  generation     Generation?   @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  modificationId String?
+  modification   Modification? @relation(fields: [modificationId], references: [id], onDelete: Cascade)
+  yearFrom       Int?
+  yearTo         Int?
+  note           String?
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([brandId, modelId, generationId])
+  @@index([generationId])
+}
+
+model ProductRelation {
+  id                String  @id @default(cuid())
+  productId         String
+  product           Product @relation("RelationSource", fields: [productId], references: [id], onDelete: Cascade)
+  relatedProductId  String
+  relatedProduct    Product @relation("RelationTarget", fields: [relatedProductId], references: [id], onDelete: Cascade)
+  type              String  @default("accessory") // accessory | analog | similar
+  sortOrder         Int     @default(100)
+
+  @@unique([productId, relatedProductId, type])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Корзина и заказы
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  qty       Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id            String  @id @default(cuid())
+  number        String  @unique // G19-000123
+  userId        String?
+  user          User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  customerName  String
+  customerPhone String
+  customerEmail String?
+
+  cityId        String?
+  city          City?   @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  cityName      String
+
+  deliveryType       String // pickup | cdek_pvz | cdek_courier | boxberry_pvz | post | courier_local
+  deliveryProvider   String? // cdek | boxberry | post | own
+  deliveryAddress    String?
+  pickupPointCode    String?
+  pickupPointAddress String?
+  deliveryPrice      Int     @default(0)
+  deliveryDaysMin    Int?
+  deliveryDaysMax    Int?
+  deliveryComment    String?
+
+  paymentType   String  @default("cash") // cash | card_online | card_on_delivery | invoice
+  status        String  @default("new") // new | confirmed | assembling | shipped | done | canceled
+  paymentStatus String  @default("pending") // pending | paid | refunded | failed
+
+  installRequested Boolean @default(false)
+  installPrice     Int?
+  installAddress   String?
+
+  itemsTotal Int
+  discount   Int @default(0)
+  total      Int
+
+  promoCode       String?
+  comment         String?
+  managerComment  String?
+  source          String? // site | phone | configurator
+  carInfo         String? // "Toyota Camry XV70 2018-2021"
+  statusHistory   Json?
+  ip              String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  confirmedAt DateTime?
+  shippedAt   DateTime?
+  doneAt      DateTime?
+  canceledAt  DateTime?
+  paidAt      DateTime?
+
+  items   OrderItem[]
+  reviews Review[]
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@index([customerPhone])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  sku       String?
+  slug      String?
+  image     String?
+  price     Int
+  qty       Int
+  total     Int
+
+  @@index([orderId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Отзывы, заявки, подписчики
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Review {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderId     String?
+  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  authorName  String
+  rating      Int      @default(5)
+  title       String?
+  text        String
+  pros        String?
+  cons        String?
+  status      String   @default("pending") // pending | published | rejected
+  isVerified  Boolean  @default(false)
+  adminReply  String?
+  adminReplyAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([productId, status])
+}
+
+model CallbackRequest {
+  id             String   @id @default(cuid())
+  type           String   @default("callback") // callback | question | vin | install | wholesale
+  name           String
+  phone          String
+  email          String?
+  message        String?
+  carInfo        String?
+  productId      String?
+  product        Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  status         String   @default("new") // new | in_progress | done | spam
+  managerComment String?
+  source         String?
+  createdAt      DateTime @default(now())
+  processedAt    DateTime?
+
+  @@index([status, createdAt])
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// География и доставка
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// «Гараж» покупателя — сохранённые автомобили.
+/// Незанятая ниша рынка: конфигуратор есть у всех конкурентов, сохранение авто — ни у кого.
+model SavedCar {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brandId        String
+  brand          Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  modelId        String?
+  model          CarModel?     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  generationId   String?
+  generation     Generation?   @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  modificationId String?
+  modification   Modification? @relation(fields: [modificationId], references: [id], onDelete: Cascade)
+  label          String? // «Моя Camry»
+  isPrimary      Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+
+  @@unique([userId, brandId, modelId, generationId, modificationId])
+  @@index([userId])
+}
+
+/// Онлайн-запись на установку (багажник, фаркоп, электрика).
+model InstallBooking {
+  id         String    @id @default(cuid())
+  name       String
+  phone      String
+  email      String?
+  cityId     String?
+  city       City?     @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  carInfo    String
+  productIds String? // список id товаров через запятую
+  comment    String?
+  slotDate   DateTime?
+  slotTime   String?
+  price      Int?
+  status     String    @default("new") // new | confirmed | done | canceled
+  managerComment String?
+  orderId    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model City {
+  id                 String   @id @default(cuid())
+  name               String
+  slug               String   @unique
+  region             String?
+  phone              String?
+  address            String?
+  workTime           String?
+  deliveryDays       Int      @default(3)
+  freeDeliveryFrom   Int? // в копейках
+  pickupAvailable    Boolean  @default(true)
+  deliveryAvailable  Boolean  @default(true)
+  isDefault          Boolean  @default(false)
+  isActive           Boolean  @default(true)
+  sortOrder          Int      @default(100)
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  orders         Order[]
+  tariffs        DeliveryTariff[]
+  pickupPoints   PickupPoint[]
+  users          User[]
+  addresses      Address[]
+  installBookings InstallBooking[]
+
+  @@index([isActive, sortOrder])
+}
+
+model DeliveryTariff {
+  id            String   @id @default(cuid())
+  provider      String // cdek | boxberry | post | own | pickup
+  cityId        String?
+  city          City?    @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  name          String
+  price         Int
+  minDays       Int      @default(1)
+  maxDays       Int      @default(5)
+  minOrderTotal Int?
+  maxWeight     Int?
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(100)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([cityId, provider, isActive])
+}
+
+model PickupPoint {
+  id        String   @id @default(cuid())
+  provider  String // cdek | boxberry | post | own
+  cityId    String
+  city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  code      String
+  name      String?
+  address   String
+  workTime  String?
+  phone     String?
+  lat       Float?
+  lng       Float?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, code])
+  @@index([cityId, provider, isActive])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Контент и настройки
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Banner {
+  id          String    @id @default(cuid())
+  title       String
+  subtitle    String?
+  description String?
+  image       String
+  mobileImage String?
+  badge       String?
+  linkUrl     String?
+  linkText    String?
+  position    String    @default("hero") // hero | promo | category
+  textAlign   String    @default("left")
+  sortOrder   Int       @default(100)
+  isActive    Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([position, isActive, sortOrder])
+}
+
+model Page {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  content        String
+  excerpt        String?
+  isPublished    Boolean  @default(true)
+  showInHeader   Boolean  @default(false)
+  showInFooter   Boolean  @default(true)
+  sortOrder      Int      @default(100)
+  seoTitle       String?
+  seoDescription String?
+  updatedAt      DateTime @updatedAt
+  createdAt      DateTime @default(now())
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  group     String   @default("general") // general | contacts | seo | delivery | payment | social
+  label     String?
+  type      String   @default("text") // text | textarea | number | bool | image
+  sortOrder Int      @default(100)
+  updatedAt DateTime @updatedAt
+}
+
+model ImportJob {
+  id           String    @id @default(cuid())
+  fileName     String
+  sourceType   String // xml | yml | csv
+  supplierId   String?
+  supplier     Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status       String    @default("pending") // pending | running | done | failed
+  mode         String    @default("update") // update | insert_only | dry_run
+  totalRows    Int       @default(0)
+  createdCount Int       @default(0)
+  updatedCount Int       @default(0)
+  skippedCount Int       @default(0)
+  errorCount   Int       @default(0)
+  log          String?
+  createdAt    DateTime  @default(now())
+  finishedAt   DateTime?
+
+  @@index([status, createdAt])
+}

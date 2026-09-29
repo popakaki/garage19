@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Изображение отсутствует">
+  <defs>
+    <linearGradient id="fb-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6f7f9" />
+      <stop offset="100%" stop-color="#e5e8ee" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#fb-bg)" />
+  <rect x="14" y="14" width="772" height="572" rx="22" fill="none" stroke="#1e2430" stroke-opacity="0.1" stroke-width="2" />
+  <g transform="translate(400 268)" stroke="#1e2430" stroke-opacity="0.32" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-130" y="-96" width="260" height="192" rx="20" />
+    <circle cx="-42" cy="-30" r="26" />
+    <path d="M-130 44 L-30 -30 L54 44 L96 8 L130 46" />
+  </g>
+  <g font-family="'Segoe UI', Roboto, Arial, sans-serif" text-anchor="middle">
+    <text x="400" y="446" font-size="30" font-weight="700" fill="#1e2430" fill-opacity="0.7">Garage19</text>
+    <text x="400" y="486" font-size="22" fill="#1e2430" fill-opacity="0.5">Изображение скоро появится</text>
+  </g>
+</svg>

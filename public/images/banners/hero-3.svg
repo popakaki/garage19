@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" role="img" aria-label="Фаркопы с установкой и ГИБДД">
+  <defs>
+    <linearGradient id="bn-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#134e4a" />
+    </linearGradient>
+    <radialGradient id="bn-glow" cx="78%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="600" fill="url(#bn-bg)" />
+  <rect width="1600" height="600" fill="url(#bn-glow)" />
+  
+    <g transform="translate(980 190)" opacity="0.95">
+      <rect x="20" y="60" width="560" height="38" rx="19" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-opacity="0.5" stroke-width="5" />
+      <rect x="140" y="98" width="34" height="80" rx="12" fill="#ffffff" fill-opacity="0.2" />
+      <rect x="430" y="98" width="34" height="80" rx="12" fill="#ffffff" fill-opacity="0.2" />
+      <path d="M292 98 H308 V150" stroke="#ffffff" stroke-opacity="0.6" stroke-width="18" stroke-linecap="round" />
+      <circle cx="300" cy="184" r="42" fill="#f97316" />
+      <circle cx="300" cy="184" r="16" fill="#ffffff" fill-opacity="0.75" />
+    </g>
+  <g font-family="'Segoe UI', Roboto, Arial, sans-serif" fill="#ffffff">
+    <rect x="90" y="112" width="225" height="52" rx="26" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-opacity="0.38" stroke-width="2" />
+    <text x="118" y="146" font-size="24" font-weight="600">Фаркопы (ТСУ)</text>
+    <text x="90" y="268" font-size="68" font-weight="800">Фаркопы с установкой и ГИБДД</text>
+    <text x="90" y="336" font-size="30" fill-opacity="0.86">Паспорт и сертификат в комплекте. Запись на установку онлайн</text>
+    <rect x="90" y="392" width="330" height="76" rx="38" fill="#f97316" />
+    <text x="255" y="440" text-anchor="middle" font-size="28" font-weight="700">Подобрать по авто</text>
+    <text x="90" y="536" font-size="24" fill-opacity="0.7">Garage19 · доставка по России · установка в сервисе</text>
+  </g>
+</svg>

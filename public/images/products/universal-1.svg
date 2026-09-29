@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Универсальный товар — плейсхолдер">
+  <defs>
+    <linearGradient id="ph-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6f7f9" />
+      <stop offset="100%" stop-color="#e7eaef" />
+    </linearGradient>
+    <radialGradient id="ph-glow" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#0f766e" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#0f766e" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#ph-bg)" />
+  <rect width="800" height="600" fill="url(#ph-glow)" />
+  <rect x="14" y="14" width="772" height="572" rx="22" fill="none" stroke="#1e2430" stroke-opacity="0.1" stroke-width="2" />
+  
+  <g font-family="'Segoe UI', Roboto, Arial, sans-serif">
+    <text x="40" y="66" font-size="26" font-weight="700" fill="#1e2430">Garage19</text>
+    <text x="40" y="98" font-size="17" fill="#6b7280">Универсальный товар</text>
+    <text x="760" y="66" text-anchor="end" font-size="17" font-weight="600" fill="#f97316">universal</text>
+  </g>
+  
+    <g fill="#1e2430">
+      <rect x="300" y="286" width="200" height="42" rx="14" />
+      <rect x="286" y="336" width="228" height="26" rx="10" fill-opacity="0.85" />
+    </g>
+    <g fill="#f97316">
+      <circle cx="330" cy="386" r="32" />
+      <circle cx="470" cy="386" r="32" />
+    </g>
+    <g stroke="#1e2430" stroke-width="9" stroke-linecap="round" fill="none">
+      <path d="M330 386 L400 344 L470 386" />
+      <path d="M400 344 V300" />
+    </g>
+  
+  <line x1="90" y1="472" x2="710" y2="472" stroke="#1e2430" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round" />
+  <g font-family="'Segoe UI', Roboto, Arial, sans-serif">
+    <text x="400" y="540" text-anchor="middle" font-size="20" fill="#1e2430" fill-opacity="0.55">Изображение-плейсхолдер · фото добавляется в админке</text>
+  </g>
+</svg>

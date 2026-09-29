@@ -19,7 +19,9 @@ import {
   isId,
   parseDelimited,
   redirectWith,
+  errorToastCode,
   runTransaction as runTx,
+  toState,
   type ActionResult,
   type ActionState,
   type TxClient,
@@ -400,7 +402,7 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function bulkProductAction(formData: FormData): Promise<void> {
-  await guardAction("products", async (user) => {
+  const result = await guardAction("products", async (user) => {
     const ids = getFormList(formData, "ids").filter(isId);
     const operation = getFormString(formData, "operation");
     const value = getFormFloat(formData, "value");
@@ -463,13 +465,13 @@ export async function bulkProductAction(formData: FormData): Promise<void> {
     return { ok: true };
   });
 
-  redirectWith("/admin/products", "product.bulk");
+  redirectWith("/admin/products", errorToastCode(result) ?? "product.bulk");
 }
 
 /** Изменение цены одного товара на процент (со страницы товара). */
-export async function changeProductPriceAction(formData: FormData): Promise<ActionResult> {
-  return guardAction("products", async (user) => {
-    const id = getFormString(formData, "id");
+export async function changeProductPriceAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = getFormString(formData, "id");
+  const result = await guardAction("products", async (user) => {
     const percentValue = getFormFloat(formData, "percent");
     if (!isId(id)) return fail("Товар не найден");
     if (percentValue === undefined || percentValue === 0) return fail("Укажите процент");
@@ -480,18 +482,19 @@ export async function changeProductPriceAction(formData: FormData): Promise<Acti
     const nextPrice = Math.max(0, Math.round(product.price * (1 + percentValue / 100)));
     await prisma.product.update({ where: { id }, data: { price: nextPrice } });
     await audit(user, "update", "product", id, { price: { before: product.price, after: nextPrice }, percent: percentValue });
-    revalidateProducts(id);
     return { ok: true };
   });
+  revalidateProducts(isId(id) ? id : undefined);
+  return toState(result);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Изображения, характеристики, документы
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function updateProductImagesAction(formData: FormData): Promise<ActionResult> {
-  return guardAction("products", async (user) => {
-    const id = getFormString(formData, "id");
+export async function updateProductImagesAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = getFormString(formData, "id");
+  const result = await guardAction("products", async (user) => {
     if (!isId(id)) return fail("Товар не найден");
 
     const product = await prisma.product.findUnique({
@@ -510,14 +513,15 @@ export async function updateProductImagesAction(formData: FormData): Promise<Act
     });
 
     await audit(user, "update", "product", id, { images: urls.length, uploaded });
-    revalidateProducts(id);
     return { ok: true };
   });
+  revalidateProducts(isId(id) ? id : undefined);
+  return toState(result);
 }
 
-export async function updateProductAttributesAction(formData: FormData): Promise<ActionResult> {
-  return guardAction("products", async (user) => {
-    const id = getFormString(formData, "id");
+export async function updateProductAttributesAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = getFormString(formData, "id");
+  const result = await guardAction("products", async (user) => {
     if (!isId(id)) return fail("Товар не найден");
 
     const values = parseAttributeValues(formData);
@@ -529,14 +533,15 @@ export async function updateProductAttributesAction(formData: FormData): Promise
     });
 
     await audit(user, "update", "product", id, { attributes: values.length });
-    revalidateProducts(id);
     return { ok: true };
   });
+  revalidateProducts(isId(id) ? id : undefined);
+  return toState(result);
 }
 
-export async function updateProductDocumentsAction(formData: FormData): Promise<ActionResult> {
-  return guardAction("products", async (user) => {
-    const id = getFormString(formData, "id");
+export async function updateProductDocumentsAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = getFormString(formData, "id");
+  const result = await guardAction("products", async (user) => {
     if (!isId(id)) return fail("Товар не найден");
 
     const documents = parseDocuments(getFormLines(formData, "documents"));
@@ -544,10 +549,10 @@ export async function updateProductDocumentsAction(formData: FormData): Promise<
     const files = formData.getAll("documentFiles").filter((value): value is File => typeof value === "object" && value !== null);
     for (const file of files) {
       if (!file || file.size === 0) continue;
-      const result = await saveUpload(file, "documents");
-      if (result.ok) {
-        uploaded.push(result.url);
-        documents.push({ type: "other", title: file.name, url: result.url });
+      const uploadResult = await saveUpload(file, "documents");
+      if (uploadResult.ok) {
+        uploaded.push(uploadResult.url);
+        documents.push({ type: "other", title: file.name, url: uploadResult.url });
       }
     }
 
@@ -556,14 +561,15 @@ export async function updateProductDocumentsAction(formData: FormData): Promise<
     });
 
     await audit(user, "update", "product", id, { documents: documents.length, uploaded });
-    revalidateProducts(id);
     return { ok: true };
   });
+  revalidateProducts(isId(id) ? id : undefined);
+  return toState(result);
 }
 
-export async function updateProductRelationsAction(formData: FormData): Promise<ActionResult> {
-  return guardAction("products", async (user) => {
-    const id = getFormString(formData, "id");
+export async function updateProductRelationsAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = getFormString(formData, "id");
+  const result = await guardAction("products", async (user) => {
     if (!isId(id)) return fail("Товар не найден");
 
     const type = getFormString(formData, "relationType") || "accessory";
@@ -578,9 +584,10 @@ export async function updateProductRelationsAction(formData: FormData): Promise<
     });
 
     await audit(user, "update", "product", id, { relations: { type: safeType, added: relatedIds.length } });
-    revalidateProducts(id);
     return { ok: true };
   });
+  revalidateProducts(isId(id) ? id : undefined);
+  return toState(result);
 }
 
 export async function deleteProductRelationAction(formData: FormData): Promise<void> {

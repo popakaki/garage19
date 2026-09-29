@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { CALLBACK_STATUSES, CALLBACK_TYPES } from "@/lib/constants";
 import {
   audit,
+  errorToastCode,
   fail,
   getFormEnum,
   getFormOptional,
@@ -13,7 +14,9 @@ import {
   guardAction,
   isId,
   redirectWith,
+  toState,
   type ActionResult,
+  type ActionState,
 } from "@/lib/admin/actions";
 
 /**
@@ -24,7 +27,11 @@ import {
 const CALLBACK_STATUS_KEYS = Object.keys(CALLBACK_STATUSES);
 const CALLBACK_TYPE_KEYS = Object.keys(CALLBACK_TYPES);
 
-export async function updateCallbackAction(formData: FormData): Promise<ActionResult> {
+export async function updateCallbackAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyCallbackUpdate(formData));
+}
+
+async function applyCallbackUpdate(formData: FormData): Promise<ActionResult> {
   return guardAction("callbacks", async (user) => {
     const id = getFormString(formData, "id");
     if (!isId(id)) return fail("Заявка не найдена");
@@ -63,8 +70,8 @@ export async function updateCallbackAction(formData: FormData): Promise<ActionRe
 export async function setCallbackStatusAction(formData: FormData): Promise<void> {
   const status = getFormString(formData, "status");
   let toast = "callback.updated";
-  const result = await updateCallbackAction(formData);
-  if (!result.ok) toast = "error.invalid";
+  const result = await updateCallbackAction(null, formData);
+  if (!result || !("ok" in result) || result.ok !== true) toast = "error.invalid";
   redirectWith("/admin/callbacks", toast, { status });
 }
 
@@ -94,7 +101,7 @@ export async function deleteCallbackAction(formData: FormData): Promise<void> {
 export async function bulkCallbackSpamAction(formData: FormData): Promise<void> {
   const ids = formData.getAll("ids").filter((value): value is string => typeof value === "string" && isId(value));
 
-  await guardAction("callbacks", async (user) => {
+  const result = await guardAction("callbacks", async (user) => {
     if (ids.length === 0) return fail("Выберите заявки");
     await prisma.callbackRequest.updateMany({
       where: { id: { in: ids } },
@@ -106,11 +113,15 @@ export async function bulkCallbackSpamAction(formData: FormData): Promise<void> 
     return { ok: true };
   });
 
-  redirectWith("/admin/callbacks", "callback.updated");
+  redirectWith("/admin/callbacks", errorToastCode(result) ?? "callback.updated");
 }
 
 /** VIN-заявки: пометить обработанной и сохранить результат подбора. */
-export async function completeVinCallbackAction(formData: FormData): Promise<ActionResult> {
+export async function completeVinCallbackAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyVinComplete(formData));
+}
+
+async function applyVinComplete(formData: FormData): Promise<ActionResult> {
   return guardAction("callbacks", async (user) => {
     const id = getFormString(formData, "id");
     const result = getFormOptional(formData, "result");

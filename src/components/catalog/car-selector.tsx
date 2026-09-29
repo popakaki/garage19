@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Car, CheckCircle2, Search } from "lucide-react";
 import { Alert, Badge, Button } from "@/components/ui";
-import { requestCarSelectionAction } from "@/lib/actions/catalog";
+import { requestCarSelectionFormAction } from "@/lib/actions/catalog";
 import { formatYears } from "@/lib/utils";
 
 export type CarSelectorBrand = {
@@ -269,7 +269,7 @@ export function CarSelector({
             Пришлите VIN или опишите автомобиль — менеджер проверит совместимость по каталогам
             производителей и вернётся с точным ответом. Это займёт до одного рабочего дня.
           </p>
-          <form action={requestCarSelectionAction} className="mt-3 grid gap-2 sm:grid-cols-2">
+          <form action={requestCarSelectionFormAction} className="mt-3 grid gap-2 sm:grid-cols-2">
             <input type="hidden" name="source" value="car_selector" />
             <input type="hidden" name="carInfo" value={label} />
             <label className="block">

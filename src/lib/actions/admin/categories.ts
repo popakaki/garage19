@@ -6,6 +6,7 @@ import { slugify } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/auth";
 import {
   audit,
+  errorToastCode,
   fail,
   getFormBoolStrict,
   getFormInt,
@@ -15,6 +16,7 @@ import {
   guardAction,
   isId,
   redirectWith,
+  toState,
   type ActionResult,
   type ActionState,
 } from "@/lib/admin/actions";
@@ -179,7 +181,11 @@ export async function deleteCategoryAction(formData: FormData): Promise<void> {
 }
 
 /** Перенос товаров из одной категории в другую. */
-export async function moveCategoryProductsAction(formData: FormData): Promise<ActionResult> {
+export async function moveCategoryProductsAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyCategoryMove(formData));
+}
+
+async function applyCategoryMove(formData: FormData): Promise<ActionResult> {
   return guardAction("categories", async (user) => {
     const fromId = getFormString(formData, "fromId");
     const toId = getFormString(formData, "toId");
@@ -198,21 +204,21 @@ export async function moveSelectedProductsAction(formData: FormData): Promise<vo
   const productIds = getFormList(formData, "ids").filter(isId);
   const toId = getFormString(formData, "toId");
 
-  await guardAction("categories", async (user) => {
+  const result = await guardAction("categories", async (user) => {
     if (productIds.length === 0) return fail("Выберите товары");
     if (!isId(toId)) return fail("Выберите категорию назначения");
-    const result = await prisma.product.updateMany({ where: { id: { in: productIds } }, data: { categoryId: toId } });
-    await audit(user, "update", "category", toId, { moved: result.count, ids: productIds.slice(0, 50) });
+    const moved = await prisma.product.updateMany({ where: { id: { in: productIds } }, data: { categoryId: toId } });
+    await audit(user, "update", "category", toId, { moved: moved.count, ids: productIds.slice(0, 50) });
     revalidateCategories();
     return { ok: true };
   });
 
-  redirectWith("/admin/categories", "category.moved");
+  redirectWith("/admin/categories", errorToastCode(result) ?? "category.moved");
 }
 
 /** Обновление порядка сортировки: поле `order_<id>`. */
 export async function updateCategoryOrderAction(formData: FormData): Promise<void> {
-  await guardAction("categories", async (user) => {
+  const result = await guardAction("categories", async (user) => {
     const updates: { id: string; sortOrder: number }[] = [];
     for (const [key, value] of formData.entries()) {
       if (!key.startsWith("order_") || typeof value !== "string") continue;
@@ -231,5 +237,5 @@ export async function updateCategoryOrderAction(formData: FormData): Promise<voi
     return { ok: true };
   });
 
-  redirectWith("/admin/categories", "category.updated");
+  redirectWith("/admin/categories", errorToastCode(result) ?? "category.updated");
 }

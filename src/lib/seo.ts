@@ -47,6 +47,8 @@ export async function buildMetadata(input: SeoInput = {}): Promise<Metadata> {
       type: input.type === "article" ? "article" : "website",
       images: images.length ? images.map((image) => ({ url: image })) : undefined,
     },
+    // Open Graph для товара: Next не поддерживает type="product" в Metadata, поэтому дублируем через other
+    other: input.type === "product" ? { "og:type": "product" } : undefined,
     twitter: {
       card: "summary_large_image",
       title,

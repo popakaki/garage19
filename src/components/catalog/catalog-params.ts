@@ -227,7 +227,7 @@ export function countActiveFilters(state: CatalogQueryState): number {
   return count;
 }
 
-type ParamValue = string | string[] | undefined | null;
+type ParamValue = string | number | string[] | undefined | null;
 
 function appendParam(search: URLSearchParams, key: string, value: ParamValue): void {
   if (value === undefined || value === null) return;
@@ -236,7 +236,7 @@ function appendParam(search: URLSearchParams, key: string, value: ParamValue): v
     return;
   }
   if (value === "") return;
-  search.append(key, value);
+  search.append(key, String(value));
 }
 
 /**

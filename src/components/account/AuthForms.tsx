@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import {
   loginAction,
   registerAction,
@@ -17,7 +18,8 @@ import { formatPhoneInput } from "@/lib/utils";
  */
 
 export function LoginForm({ next }: { next?: string }) {
-  const [state, formAction, pending] = useActionState(loginAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(loginAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -60,7 +62,8 @@ export function LoginForm({ next }: { next?: string }) {
 }
 
 export function RegisterForm() {
-  const [state, formAction, pending] = useActionState(registerAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(registerAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -147,7 +150,8 @@ export function RegisterForm() {
 }
 
 export function ResetRequestForm() {
-  const [state, formAction, pending] = useActionState(requestPasswordResetAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(requestPasswordResetAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-4">

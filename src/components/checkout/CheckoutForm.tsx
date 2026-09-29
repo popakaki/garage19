@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createOrderAction } from "@/lib/actions/order";
 import { Alert, Button, ButtonLink, Card, Checkbox, Field, Input, Select, Textarea } from "@/components/ui";
 import { formatPhoneInput, formatPrice, formatWeight } from "@/lib/utils";
@@ -88,7 +89,8 @@ export function CheckoutForm({
   prefill: { name: string; phone: string; email: string; address: string; carInfo: string; cityId: string };
   installPrice: number;
 }) {
-  const [state, formAction, pending] = useActionState(createOrderAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(createOrderAction, {}, pathname);
 
   const [deliveryType, setDeliveryType] = useState<string>("cdek_pvz");
   const [cityId, setCityId] = useState<string>(prefill.cityId || defaultCityId);

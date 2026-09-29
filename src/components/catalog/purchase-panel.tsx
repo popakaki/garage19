@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Minus, Plus, X, Zap } from "lucide-react";
 import { AddToCartButton } from "@/components/catalog/add-to-cart-button";
 import { Button, Field, Input, Textarea } from "@/components/ui";
-import { quickOrderAction } from "@/lib/actions/catalog";
+import { quickOrderFormAction } from "@/lib/actions/catalog";
 import { cn } from "@/lib/utils";
 
 /**
@@ -116,7 +116,7 @@ export function PurchasePanel({
               </button>
             </div>
 
-            <form action={quickOrderAction} className="mt-4 grid gap-3">
+            <form action={quickOrderFormAction} className="mt-4 grid gap-3">
               <input type="hidden" name="productId" value={productId} />
               <input type="hidden" name="qty" value={qty} />
               <Field label="Имя" required htmlFor="quick-order-name">

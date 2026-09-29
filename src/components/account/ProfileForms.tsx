@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import {
   changePasswordAction,
   deleteAddressAction,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/actions/account";
 import { Alert, Badge, Button, Card, Field, Input, Select } from "@/components/ui";
 import { AddressForm } from "@/components/account/AddressForm";
+import { voidAction } from "@/lib/form-action";
 import { formatPhoneInput } from "@/lib/utils";
 
 /** Форма профиля: ФИО, телефон, e-mail, город. */
@@ -20,7 +22,8 @@ export function ProfileForm({
   user: { name: string; email: string; phone: string | null; cityId: string | null };
   cities: { id: string; name: string }[];
 }) {
-  const [state, formAction, pending] = useActionState(updateProfileAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(updateProfileAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -79,7 +82,8 @@ export function ProfileForm({
 
 /** Смена пароля из личного кабинета. */
 export function ChangePasswordForm() {
-  const [state, formAction, pending] = useActionState(changePasswordAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(changePasswordAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -157,7 +161,7 @@ export function AddressList({
                   </Button>
 
                   {!address.isDefault && (
-                    <form action={setDefaultAddressAction}>
+                    <form action={voidAction(setDefaultAddressAction)}>
                       <input type="hidden" name="id" value={address.id} />
                       <Button type="submit" variant="ghost" size="xs">
                         Сделать основным
@@ -165,7 +169,7 @@ export function AddressList({
                     </form>
                   )}
 
-                  <form action={deleteAddressAction}>
+                  <form action={voidAction(deleteAddressAction)}>
                     <input type="hidden" name="id" value={address.id} />
                     <Button type="submit" variant="ghost" size="xs" className="text-ink-400 hover:text-danger-600">
                       Удалить

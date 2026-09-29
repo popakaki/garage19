@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import { saveAddressAction } from "@/lib/actions/account";
 import { Alert, Button, Checkbox, Field, Input, Select } from "@/components/ui";
 
@@ -17,7 +18,8 @@ export function AddressForm({
   initial?: { id: string; title: string; cityId: string | null; street: string; comment: string | null; isDefault: boolean };
   onDone?: () => void;
 }) {
-  const [state, formAction, pending] = useActionState(saveAddressAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(saveAddressAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-3">

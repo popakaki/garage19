@@ -1,12 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import { applyPromoAction, removePromoAction } from "@/lib/actions/order";
 import { Button, Input } from "@/components/ui";
 
 /**
  * Промокод: применение — Server Action, проверка кода только на сервере.
  * Скидка применяется повторно при создании заказа, значение из формы не используется.
+ * `permalink` делает форму работоспособной и при отключённом JavaScript.
  */
 export function PromoForm({
   applied,
@@ -15,7 +17,12 @@ export function PromoForm({
   applied?: { code: string; percent: number } | null;
   hint?: string | null;
 }) {
-  const [state, formAction, pending] = useActionState(applyPromoAction, {} as { error?: string; success?: string });
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(
+    applyPromoAction,
+    {} as { error?: string; success?: string },
+    pathname,
+  );
 
   if (applied) {
     return (

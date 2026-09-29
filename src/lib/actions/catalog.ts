@@ -144,6 +144,27 @@ export async function requestCarSelectionAction(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Варианты для <form action={...}>: форма ожидает Promise<void>,
+// поэтому ошибки валидации просто не создают заявку.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function quickOrderFormAction(formData: FormData): Promise<void> {
+  await quickOrderAction(formData);
+}
+
+export async function askQuestionFormAction(formData: FormData): Promise<void> {
+  await askQuestionAction(formData);
+}
+
+export async function requestCarSelectionFormAction(formData: FormData): Promise<void> {
+  await requestCarSelectionAction(formData);
+}
+
+export async function createCallbackFormAction(formData: FormData): Promise<void> {
+  await createCallbackAction(formData);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Запрос обратного звонка / оптовый запрос (используется страницами каталога)
 // ─────────────────────────────────────────────────────────────────────────────
 

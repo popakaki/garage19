@@ -87,7 +87,9 @@ export function AddToCartButton({
       action={addToCartAction}
       className={cn("relative", className)}
       onSubmit={() => {
-        window.setTimeout(() => setAdded(true), 400);
+        window.setTimeout(() => {
+          setAdded(true);
+        }, 400);
       }}
     >
       <input type="hidden" name="productId" value={productId} />

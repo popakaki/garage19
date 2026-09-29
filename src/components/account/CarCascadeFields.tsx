@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import { saveCarAction } from "@/lib/actions/account";
 import { Alert, Button, Checkbox, Field, Input, Select } from "@/components/ui";
 
@@ -210,7 +211,8 @@ export function CarCascadeFields({
 
 /** Форма добавления автомобиля: показывает ошибки сервера без перезагрузки. */
 export function AddCarForm({ brands }: { brands: CascadeOption[] }) {
-  const [state, formAction, pending] = useActionState(saveCarAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(saveCarAction, {}, pathname);
   const [open, setOpen] = useState(false);
 
   return (

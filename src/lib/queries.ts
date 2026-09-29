@@ -1024,6 +1024,18 @@ export async function getProductsByIds(ids: string[]): Promise<ProductCard[]> {
 }
 
 /**
+ * Карточки товаров вместе с весом — для корзины и расчёта доставки.
+ * (PRODUCT_CARD_SELECT не содержит вес: на листингах он не нужен.)
+ */
+export async function getCartProductCards(ids: string[]) {
+  if (!ids.length) return [];
+  return prisma.product.findMany({
+    where: { id: { in: ids }, isActive: true },
+    select: { ...PRODUCT_CARD_SELECT, weight: true },
+  });
+}
+
+/**
  * Марки авто, для которых есть товары-«специфичные» (fitment), с количеством
  * товаров — для блока «Подбор по автомобилю» в каталоге и на /brands.
  */
@@ -1187,7 +1199,7 @@ export async function getSavedCarsWithCounts(userId: string) {
             },
           ],
         },
-      }),
+      });
       return { ...car, productsCount: count };
     }),
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button, Card } from "@/components/ui";
-import { requestCarSelectionAction } from "@/lib/actions/catalog";
+import { requestCarSelectionFormAction } from "@/lib/actions/catalog";
 
 /**
  * Сценарий «нет моей модификации / ничего не нашлось» — самая частая точка
@@ -51,7 +51,7 @@ export function CarNotFoundRequest({
           </div>
         </div>
 
-        <form action={requestCarSelectionAction} className="grid gap-3 sm:grid-cols-2">
+        <form action={requestCarSelectionFormAction} className="grid gap-3 sm:grid-cols-2">
           <input type="hidden" name="source" value={source} />
           {carLabel && <input type="hidden" name="carInfo" value={carLabel} />}
           <label className="block">

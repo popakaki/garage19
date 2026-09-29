@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Пример произвольного XML-прайса (не YML): структура <price><items><item>.
+  Проверяет, что парсер находит узлы item и читает значения из вложенных элементов.
+-->
+<price generated="2025-05-15T06:00:00+03:00" supplier="Atera Pro">
+  <items>
+    <item code="AP-2001" available="1">
+      <article>ORIS-VW-PASSAT-B8</article>
+      <title>Фаркоп Oris для Volkswagen Passat B8 вертикальный съёмный</title>
+      <brand>Oris</brand>
+      <price>45900.00</price>
+      <oldPrice>49900.00</oldPrice>
+      <quantity>5</quantity>
+      <weight>19.4</weight>
+      <group>Тягово-сцепные устройства</group>
+      <annotation>Вертикальный съёмный крюк, механизм полностью скрыт. Тяговая нагрузка 2200 кг.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/oris/passat-b8-1.jpg</image>
+        <image>https://cdn.atera-pro.example/oris/passat-b8-2.jpg</image>
+      </images>
+      <properties>
+        <property name="Тип крюка" value="вертикальный съёмный"/>
+        <property name="Материал" value="сталь"/>
+        <property name="Тяговая нагрузка" value="2200"/>
+        <property name="Вертикальная нагрузка" value="90"/>
+        <property name="Вырез бампера" value="нет"/>
+        <property name="Электрика в комплекте" value="нет"/>
+        <property name="Гарантия" value="36"/>
+      </properties>
+      <compatibility>Volkswagen Passat B8;Skoda Octavia A8;Skoda Kodiaq</compatibility>
+    </item>
+    <item code="AP-2002" available="1">
+      <article>GALIA-SKODA-KODIAQ</article>
+      <title>Фаркоп Galia для Skoda Kodiaq съёмный</title>
+      <brand>Galia</brand>
+      <price>32500</price>
+      <quantity>8</quantity>
+      <weight>21.6</weight>
+      <group>Фаркопы</group>
+      <annotation>Чешский фаркоп для Kodiaq: 2200 кг тяговой и 100 кг вертикальной нагрузки.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/galia/kodiaq-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Тип крюка" value="съёмный"/>
+        <property name="Материал" value="сталь"/>
+        <property name="Тяговая нагрузка" value="2200"/>
+        <property name="Вертикальная нагрузка" value="100"/>
+        <property name="Вырез бампера" value="не требуется"/>
+        <property name="Гарантия" value="24"/>
+      </properties>
+      <compatibility>Skoda Kodiaq;Skoda Karoq;Volkswagen Tiguan</compatibility>
+    </item>
+    <item code="AP-2003" available="1">
+      <article>ATE-STRADA-DL3</article>
+      <title>Велокрепление на фаркоп Atera Strada DL 3</title>
+      <brand>Atera</brand>
+      <price>29900</price>
+      <quantity>6</quantity>
+      <weight>18.4</weight>
+      <group>Крепления для велосипедов</group>
+      <annotation>Платформа на три велосипеда с откидной рамой и замками.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/atera/strada-dl3-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Место установки" value="фаркоп"/>
+        <property name="Материал" value="сталь"/>
+        <property name="Грузоподъёмность" value="60"/>
+        <property name="Количество велосипедов" value="3"/>
+        <property name="Замок в комплекте" value="да"/>
+        <property name="Гарантия" value="36"/>
+      </properties>
+    </item>
+    <item code="AP-2004" available="1">
+      <article>WHI-WB-701</article>
+      <title>Багажник на крышу Whispbar WB701 Flush Bar</title>
+      <brand>Whispbar</brand>
+      <price>28900</price>
+      <quantity>4</quantity>
+      <weight>4.8</weight>
+      <group>Поперечины</group>
+      <annotation>Самый тихий профиль: уровень шума ниже 40 дБ. Крепление в штатные места.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/whispbar/wb701-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Место установки" value="штатные места"/>
+        <property name="Материал" value="алюминий"/>
+        <property name="Профиль" value="WingBar"/>
+        <property name="Грузоподъёмность" value="75"/>
+        <property name="Замок в комплекте" value="true"/>
+        <property name="Гарантия" value="36"/>
+      </properties>
+      <compatibility>Toyota Camry XV70;Kia K5 DL3;Skoda Octavia A8</compatibility>
+    </item>
+    <item code="AP-2005" available="1">
+      <article>BRINK-HAVAL-F7</article>
+      <title>Фаркоп Brink для Haval F7 вертикальный съёмный</title>
+      <brand>Brink</brand>
+      <price>38900</price>
+      <quantity>3</quantity>
+      <weight>20.8</weight>
+      <group>Тягово-сцепные устройства</group>
+      <annotation>Нидерландский вертикальный фаркоп со скрытой установкой.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/brink/haval-f7-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Тип крюка" value="вертикальный съёмный"/>
+        <property name="Материал" value="сталь"/>
+        <property name="Тяговая нагрузка" value="2000"/>
+        <property name="Вертикальная нагрузка" value="100"/>
+        <property name="Вырез бампера" value="нет"/>
+        <property name="Гарантия" value="36"/>
+      </properties>
+      <compatibility>Haval F7;Haval Dargo;Haval Jolion</compatibility>
+    </item>
+    <item code="AP-2006" available="1">
+      <article>MEN-SKI-6</article>
+      <title>Лыжное крепление Menabo 6 пар</title>
+      <brand>Menabo</brand>
+      <price>10900</price>
+      <quantity>11</quantity>
+      <weight>4.9</weight>
+      <group>Крепления для лыж</group>
+      <annotation>Итальянское крепление на шесть пар лыж с замком в комплекте.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/menabo/ski-6-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Место установки" value="рейлинги"/>
+        <property name="Материал" value="алюминий"/>
+        <property name="Количество пар лыж" value="6"/>
+        <property name="Замок в комплекте" value="да"/>
+        <property name="Гарантия" value="24"/>
+      </properties>
+    </item>
+    <item code="AP-2007" available="1">
+      <article>EL-7TO13-ADAPTER</article>
+      <title>Адаптер переходник 7-13 pin</title>
+      <brand>Auto-Hak</brand>
+      <price>790</price>
+      <quantity>40</quantity>
+      <weight>0.32</weight>
+      <group>Электрика фаркопов</group>
+      <annotation>Переходник с 7-pin розетки на 13-pin вилку, кабель 20 см.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/electro/adapter-7-13-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Тип разъёма" value="13-pin"/>
+        <property name="Электрика в комплекте" value="да"/>
+        <property name="Гарантия" value="12"/>
+      </properties>
+    </item>
+    <item code="AP-2008" available="1">
+      <article>ATE-GIRO-044240</article>
+      <title>Велокрепление на крышу Atera Giro 044240</title>
+      <brand>Atera</brand>
+      <price>14900</price>
+      <quantity>12</quantity>
+      <weight>3.9</weight>
+      <group>Крепления для велосипедов</group>
+      <annotation>Крепление за раму с двумя дистанционными зажимами колёс.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/atera/giro-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Место установки" value="рейлинги"/>
+        <property name="Материал" value="алюминий"/>
+        <property name="Грузоподъёмность" value="20"/>
+        <property name="Гарантия" value="36"/>
+      </properties>
+      <compatibility>Kia Sportage QL;Hyundai Tucson TL;Toyota RAV4 XA50</compatibility>
+    </item>
+    <item code="AP-2009" available="1">
+      <article>LUX-STRONG-2</article>
+      <title>Багажник на крышу Lux Strong 2</title>
+      <brand>Lux</brand>
+      <price>790</price>
+      <quantity>35</quantity>
+      <weight>4.3</weight>
+      <group>Поперечины</group>
+      <annotation>Бюджетные стальные дуги с полимерным покрытием и замками.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/lux/strong-2-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Место установки" value="рейлинги"/>
+        <property name="Материал" value="сталь"/>
+        <property name="Профиль" value="прямоугольный"/>
+        <property name="Грузоподъёмность" value="60"/>
+        <property name="Замок в комплекте" value="да"/>
+        <property name="Гарантия" value="24"/>
+      </properties>
+      <compatibility>Lada Vesta;Lada Granta;Renault Duster</compatibility>
+    </item>
+    <item code="AP-2010" available="1">
+      <article>YAK-FRONTLOADER</article>
+      <title>Велокрепление на крышу Yakima FrontLoader</title>
+      <brand>Yakima</brand>
+      <price>15900</price>
+      <quantity>6</quantity>
+      <weight>4.2</weight>
+      <group>Крепления для велосипедов</group>
+      <annotation>Фиксация велосипеда за переднее колесо, без снятия колеса.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/yakima/frontloader-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Место установки" value="рейлинги"/>
+        <property name="Материал" value="алюминий"/>
+        <property name="Грузоподъёмность" value="20"/>
+        <property name="Замок в комплекте" value="да"/>
+        <property name="Гарантия" value="36"/>
+      </properties>
+    </item>
+    <item code="AP-2011" available="1">
+      <article>AUTHAK-VW-TIGUAN</article>
+      <title>Фаркоп Auto-Hak для Volkswagen Tiguan съёмный</title>
+      <brand>Auto-Hak</brand>
+      <price>31500</price>
+      <quantity>7</quantity>
+      <weight>20.6</weight>
+      <group>Фаркопы</group>
+      <annotation>Фаркоп для Tiguan I и II: 2000 кг тяговой, 100 кг вертикальной нагрузки.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/autohak/tiguan-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Тип крюка" value="съёмный"/>
+        <property name="Материал" value="сталь"/>
+        <property name="Тяговая нагрузка" value="2000"/>
+        <property name="Вертикальная нагрузка" value="100"/>
+        <property name="Вырез бампера" value="нет"/>
+        <property name="Гарантия" value="24"/>
+      </properties>
+      <compatibility>Volkswagen Tiguan;Audi Q5 8R</compatibility>
+    </item>
+    <item code="AP-2012" available="1">
+      <article>THU-948-SUMKA</article>
+      <title>Сумка для автобокса Thule GoPack (2 шт.)</title>
+      <brand>Thule</brand>
+      <price>6900</price>
+      <quantity>16</quantity>
+      <weight>3.4</weight>
+      <group>Аксессуары</group>
+      <annotation>Две сумки под размер автобокса: удобно паковать и переносить вещи.</annotation>
+      <images>
+        <image>https://cdn.atera-pro.example/thule/gopack-1.jpg</image>
+      </images>
+      <properties>
+        <property name="Материал" value="комбинированный"/>
+        <property name="Гарантия" value="24"/>
+      </properties>
+    </item>
+  </items>
+</price>

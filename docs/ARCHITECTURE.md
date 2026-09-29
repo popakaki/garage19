@@ -12,15 +12,19 @@
 prisma/schema.prisma        схема БД (единый источник правды)
 prisma/seed.ts              сиды: категории, авто, товары, баннеры, страницы
 src/app/                    маршруты App Router
-  layout.tsx                корневой layout (шапка/подвал)
-  page.tsx                  главная: слайдер + конфигуратор + витрины
-  catalog/                  каталог и листинги
-  product/[slug]/           карточка товара
-  podbor/                   SEO-посадочные «авто → товары»
-  cart/ checkout/           корзина и оформление
-  account/                  личный кабинет покупателя
-  admin/                    админка
+  layout.tsx                корневой layout (только каркас документа)
+  (site)/                   публичная витрина: общий layout с шапкой/подвалом
+    layout.tsx              шапка, подвал, кнопка обратного звонка, JSON-LD организации
+    page.tsx                главная: слайдер + конфигуратор + витрины
+    catalog/                каталог и листинги
+    product/[slug]/         карточка товара
+    podbor/                 SEO-посадочные «авто → товары»
+    cart/ checkout/         корзина и оформление
+    account/                личный кабинет покупателя
+    [slug]/                 контентные страницы из админки (доставка, оплата, оферта…)
+  admin/                    админка (собственный layout в admin/(panel), витрину не наследует)
   api/                      route handlers (JSON, импорт, доставка)
+  sitemap.ts robots.ts      SEO-файлы
 src/components/             UI-компоненты
 src/lib/                    бизнес-логика
   prisma.ts                 клиент Prisma (singleton)
@@ -62,6 +66,12 @@ docs/                       документация, конкурентный �
     У каждой страницы должен быть осмысленный `title`/`description`.
 11. **Никаких новых npm-зависимостей** без согласования со ведущим разработчиком.
 12. **TypeScript strict:** без `any`, без `@ts-ignore`. Публичные функции — с явными типами.
+13. **Файл с директивой `"use server"` может экспортировать только async-функции.**
+    Прямой реэкспорт (`export { action } from "…"`) сборка отклоняет с ошибкой
+    «Only async functions are allowed to be exported in a "use server" file».
+    Поэтому barrel `src/lib/actions/admin.ts` содержит 88 явных async-обёрток вида
+    `export async function xAction(...args: Parameters<typeof mod.xAction>) { return mod.xAction(...args); }`.
+    Новые админ-экшены добавляйте по этому же шаблону.
 
 ## Ключевые API
 
@@ -123,14 +133,18 @@ npm run build            # production-сборка
 npm run db:push          # синхронизация схемы
 npm run db:seed          # демо-данные
 npm run dev              # http://localhost:3000
+pwsh -File scripts/smoke.ps1   # сборка + дымовой тест 20+ страниц
+# в Windows PowerShell 5.1 (без pwsh) и при запрете скриптов:
+# powershell -NoProfile -ExecutionPolicy Bypass -File scripts/smoke.ps1 -NoBuild -Port 3100
 ```
 
 ## Зоны ответственности (файлы не пересекаются)
 
 | Модуль | Каталог |
 | --- | --- |
-| Фундамент, главная, конфигуратор, layout | `src/app/(root)`, `src/components/{layout,home,forms}`, `src/lib/{prisma,constants,utils,auth,cart,queries,seo,settings}.ts` |
-| Каталог и карточка | `src/app/{catalog,product,brands,podbor,search}`, `src/components/catalog`, `src/lib/actions/catalog.ts` |
-| Оформление и ЛК | `src/app/{cart,checkout,account}`, `src/components/{cart,checkout,account}`, `src/lib/{delivery}`, `src/lib/actions/{order,account,review}.ts` |
-| Админка | `src/app/admin`, `src/components/admin`, `src/lib/actions/admin.ts`, `src/lib/admin` |
-| Сиды и импорт | `prisma/seed.ts`, `src/lib/import`, `src/app/api/import` |
+| Фундамент, главная, конфигуратор, layout | `src/app/layout.tsx`, `src/app/(site)/layout.tsx`, `src/app/(site)/page.tsx`, `src/app/(site)/[slug]`, `src/components/{layout,home,forms}`, `src/lib/{prisma,constants,utils,auth,cart,queries,seo,settings,city}.ts` |
+| Каталог и карточка | `src/app/(site)/{catalog,product,brands,podbor,search,compare,wishlist}`, `src/components/catalog`, `src/lib/actions/{catalog,review}.ts` |
+| Оформление и ЛК | `src/app/(site)/{cart,checkout,account,order,install}`, `src/components/{cart,checkout,account,install}`, `src/lib/{delivery,promo,garage,checkout-schema,form-action,order-history,install-slots}.ts`, `src/lib/actions/{order,account,install,callback}.ts` |
+| Админка | `src/app/admin`, `src/components/admin`, `src/lib/actions/admin*`, `src/lib/admin` |
+| Сиды и импорт | `prisma/seed.ts`, `prisma/data`, `src/lib/import`, `src/app/api/import` |
+

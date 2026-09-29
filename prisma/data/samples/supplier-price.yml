@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Пример YML-фида поставщика (Яндекс.Маркет).
+  Используется для проверки импорта: npx tsx prisma/data/tools/test-import.ts
+  Категории намеренно названы «по-своему» — движок должен сопоставить их с каталогом.
+-->
+<yml_catalog date="2025-05-15T09:00:00+03:00">
+  <shop>
+    <name>РуфСистемс — прайс для Garage19</name>
+    <company>ООО «РуфСистемс»</company>
+    <currencies>
+      <currency id="RUR" rate="1"/>
+    </currencies>
+    <categories>
+      <category id="101">Поперечины на крышу</category>
+      <category id="102">Боксы на крышу автомобиля</category>
+      <category id="103">Крепления для велосипедов</category>
+      <category id="104">Крепления для лыж и сноубордов</category>
+      <category id="105">Тягово-сцепные устройства</category>
+      <category id="106">Аксессуары для багажных систем</category>
+    </categories>
+    <offers>
+      <offer id="RS-10001" available="true">
+        <vendorCode>THU-7204-7215</vendorCode>
+        <name>Багажник на крышу Thule WingBar Edge 7204 + 7215</name>
+        <vendor>Thule</vendor>
+        <price>31900</price>
+        <oldprice>36900</oldprice>
+        <currencyId>RUR</currencyId>
+        <categoryId>101</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/wingbar-edge-1.jpg</picture>
+        <picture>https://cdn.roofsystems.example/thule/wingbar-edge-2.jpg</picture>
+        <count>12</count>
+        <weight>6200</weight>
+        <description>Аэродинамические дуги WingBar Edge на рейлинги. Замки в комплекте, установка без инструмента.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">алюминий</param>
+        <param name="Профиль">WingBar</param>
+        <param name="Грузоподъёмность">75</param>
+        <param name="Замок в комплекте">true</param>
+        <param name="Гарантия">60</param>
+        <param name="fitment">Toyota RAV4 XA50;Kia Sportage QL;Hyundai Tucson NX4</param>
+      </offer>
+      <offer id="RS-10002" available="true">
+        <vendorCode>ATE-SIGNO-044150</vendorCode>
+        <name>Багажник на крышу Atera Signo RT 044150</name>
+        <vendor>Atera</vendor>
+        <price>25900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>101</categoryId>
+        <picture>https://cdn.roofsystems.example/atera/signo-1.jpg</picture>
+        <count>8</count>
+        <weight>5600</weight>
+        <description>Немецкие дуги овального профиля на рейлинги. Монтаж за 10 минут, ключи в комплекте.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">алюминий</param>
+        <param name="Профиль">овальный</param>
+        <param name="Грузоподъёмность">75</param>
+        <param name="Гарантия">36</param>
+        <param name="fitment">Toyota RAV4 XA40;Kia Sportage SL;Renault Duster 2015-2021</param>
+      </offer>
+      <offer id="RS-10003" available="true">
+        <vendorCode>THU-6295-MOTION-XT-XL</vendorCode>
+        <name>Автобокс Thule Motion XT XL 450 л</name>
+        <vendor>Thule</vendor>
+        <price>84500</price>
+        <oldprice>94900</oldprice>
+        <currencyId>RUR</currencyId>
+        <categoryId>102</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/motion-xt-xl-1.jpg</picture>
+        <picture>https://cdn.roofsystems.example/thule/motion-xt-xl-2.jpg</picture>
+        <picture>https://cdn.roofsystems.example/thule/motion-xt-xl-3.jpg</picture>
+        <count>5</count>
+        <weight>21500</weight>
+        <description>Флагманский автобокс 450 л с двухсторонним открытием и креплением PowerClick. Грузоподъёмность 75 кг.</description>
+        <param name="Объём">450</param>
+        <param name="Материал">ABS-пластик</param>
+        <param name="Грузоподъёмность">75</param>
+        <param name="Замок в комплекте">да</param>
+        <param name="Гарантия">60</param>
+      </offer>
+      <offer id="RS-10004" available="true">
+        <vendorCode>ATE-CASAR-400</vendorCode>
+        <name>Автобокс Atera Casar 400 л</name>
+        <vendor>Atera</vendor>
+        <price>59900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>102</categoryId>
+        <picture>https://cdn.roofsystems.example/atera/casar-400-1.jpg</picture>
+        <count>9</count>
+        <weight>19100</weight>
+        <description>Компактный бокс 400 л для кроссоверов. Крепление EasyFit, двустороннее открытие.</description>
+        <param name="Объём">400</param>
+        <param name="Материал">ABS-пластик</param>
+        <param name="Грузоподъёмность">75</param>
+        <param name="Гарантия">36</param>
+      </offer>
+      <offer id="RS-10005" available="true">
+        <vendorCode>THU-5980-PRORIDE</vendorCode>
+        <name>Велокрепление на крышу Thule ProRide 598</name>
+        <vendor>Thule</vendor>
+        <price>16900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>103</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/proride-1.jpg</picture>
+        <count>20</count>
+        <weight>4100</weight>
+        <description>Крепление велосипеда за раму с автоматической фиксацией переднего колеса. Замок в комплекте.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">алюминий</param>
+        <param name="Грузоподъёмность">20</param>
+        <param name="Замок в комплекте">true</param>
+        <param name="Количество велосипедов">1</param>
+        <param name="Гарантия">60</param>
+        <param name="fitment">Toyota Camry XV70;Kia Sportage QL;Haval Jolion</param>
+      </offer>
+      <offer id="RS-10006" available="false">
+        <vendorCode>THU-934-EASYFOLD</vendorCode>
+        <name>Велокрепление на фаркоп Thule EasyFold XT 3</name>
+        <vendor>Thule</vendor>
+        <price>33500</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>103</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/easyfold-3-1.jpg</picture>
+        <count>0</count>
+        <weight>17900</weight>
+        <description>Складная платформа на фаркоп для трёх велосипедов с откидным механизмом и замками.</description>
+        <param name="Место установки">фаркоп</param>
+        <param name="Материал">алюминий</param>
+        <param name="Грузоподъёмность">60</param>
+        <param name="Количество велосипедов">3</param>
+        <param name="Гарантия">60</param>
+      </offer>
+      <offer id="RS-10007" available="true">
+        <vendorCode>MB-BARRACUDA</vendorCode>
+        <name>Велокрепление на крышу Mont Blanc Barracuda</name>
+        <vendor>Mont Blanc</vendor>
+        <price>9900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>103</categoryId>
+        <picture>https://cdn.roofsystems.example/montblanc/barracuda-1.jpg</picture>
+        <count>25</count>
+        <weight>3400</weight>
+        <description>Лёгкое крепление за раму для велосипедов до 15 кг. Замок в комплекте.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">сталь</param>
+        <param name="Грузоподъёмность">15</param>
+        <param name="Гарантия">24</param>
+        <param name="fitment">Lada Vesta;Kia Rio FB;Hyundai Solaris HC</param>
+      </offer>
+      <offer id="RS-10008" available="true">
+        <vendorCode>THU-9283-SNOWPACK-6</vendorCode>
+        <name>Лыжное крепление Thule SnowPack 6</name>
+        <vendor>Thule</vendor>
+        <price>18500</price>
+        <oldprice>21500</oldprice>
+        <currencyId>RUR</currencyId>
+        <categoryId>104</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/snowpack-6-1.jpg</picture>
+        <count>18</count>
+        <weight>5200</weight>
+        <description>Крепление на 6 пар лыж или 4 сноуборда с аэродинамическим профилем и замком.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">алюминий</param>
+        <param name="Количество пар лыж">6</param>
+        <param name="Замок в комплекте">да</param>
+        <param name="Гарантия">60</param>
+      </offer>
+      <offer id="RS-10009" available="true">
+        <vendorCode>TOWRUS-289252</vendorCode>
+        <name>Фаркоп TowRus для Jetour T2 съёмный с электрикой</name>
+        <vendor>TowRus</vendor>
+        <price>38900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>105</categoryId>
+        <picture>https://cdn.roofsystems.example/towrus/jetour-t2-1.jpg</picture>
+        <picture>https://cdn.roofsystems.example/towrus/jetour-t2-2.jpg</picture>
+        <count>10</count>
+        <weight>21500</weight>
+        <description>Съёмный фаркоп с электрикой 13-pin. Бампер не подрезается, паспорт и сертификат в комплекте.</description>
+        <param name="Тип крюка">быстросъёмный с замком</param>
+        <param name="Материал">сталь</param>
+        <param name="Тяговая нагрузка">2000</param>
+        <param name="Вертикальная нагрузка">100</param>
+        <param name="Вырез бампера">нет</param>
+        <param name="Электрика в комплекте">true</param>
+        <param name="Тип разъёма">13-pin</param>
+        <param name="Гарантия">36</param>
+        <param name="fitment">Jetour T2;Jetour X70</param>
+      </offer>
+      <offer id="RS-10010" available="true">
+        <vendorCode>BALTEX-VESTA</vendorCode>
+        <name>Фаркоп Baltex для Lada Vesta съёмный с электрикой</name>
+        <vendor>Baltex</vendor>
+        <price>23500</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>105</categoryId>
+        <picture>https://cdn.roofsystems.example/baltex/vesta-1.jpg</picture>
+        <count>14</count>
+        <weight>17600</weight>
+        <description>Съёмный фаркоп для Lada Vesta с электрикой 7-pin. Тяговая нагрузка 1200 кг.</description>
+        <param name="Тип крюка">съёмный</param>
+        <param name="Материал">сталь</param>
+        <param name="Тяговая нагрузка">1200</param>
+        <param name="Вертикальная нагрузка">60</param>
+        <param name="Вырез бампера">не требуется</param>
+        <param name="Электрика в комплекте">да</param>
+        <param name="Тип разъёма">7-pin</param>
+        <param name="Гарантия">36</param>
+        <param name="fitment">Lada Vesta;Lada Largus</param>
+      </offer>
+      <offer id="RS-10011" available="true">
+        <vendorCode>EL-13PIN-UNI</vendorCode>
+        <name>Электрика фаркопа 13-pin универсальная с согласующим блоком</name>
+        <vendor>TowRus</vendor>
+        <price>3900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>105</categoryId>
+        <picture>https://cdn.roofsystems.example/electro/13pin-1.jpg</picture>
+        <count>30</count>
+        <weight>1800</weight>
+        <description>Комплект электрики 13-pin: розетка, жгут 2 м и электронный согласующий блок.</description>
+        <param name="Тип разъёма">13-pin</param>
+        <param name="Электрика в комплекте">да</param>
+        <param name="Гарантия">24</param>
+      </offer>
+      <offer id="RS-10012" available="true">
+        <vendorCode>THU-544-LOCK</vendorCode>
+        <name>Замок Thule Lock 544 с двумя ключами</name>
+        <vendor>Thule</vendor>
+        <price>2190</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>106</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/lock-544-1.jpg</picture>
+        <count>50</count>
+        <weight>300</weight>
+        <description>Замок с ключом для багажников, автобоксов и велокреплений Thule.</description>
+        <param name="Материал">сталь</param>
+        <param name="Замок в комплекте">да</param>
+        <param name="Гарантия">60</param>
+      </offer>
+      <offer id="RS-10013" available="true">
+        <vendorCode>THU-5992-FREEIDE</vendorCode>
+        <name>Велокрепление на крышу Thule FreeRide 532</name>
+        <vendor>Thule</vendor>
+        <price>11900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>103</categoryId>
+        <picture>https://cdn.roofsystems.example/thule/freeride-1.jpg</picture>
+        <count>15</count>
+        <weight>3600</weight>
+        <description>Базовое крепление за раму с лотком для переднего колеса и замком.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">сталь</param>
+        <param name="Грузоподъёмность">17</param>
+        <param name="Гарантия">36</param>
+        <param name="fitment">Lada Vesta;Haval Jolion;Chery Tiggo 4</param>
+      </offer>
+      <offer id="RS-10014" available="true">
+        <vendorCode>MB-XPLORER-450</vendorCode>
+        <name>Автобокс Mont Blanc Xplorer 450 л</name>
+        <vendor>Mont Blanc</vendor>
+        <price>49900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>102</categoryId>
+        <picture>https://cdn.roofsystems.example/montblanc/xplorer-450-1.jpg</picture>
+        <count>7</count>
+        <weight>19600</weight>
+        <description>Бокс 450 л с матовым корпусом и креплением Quick Mount.</description>
+        <param name="Объём">450</param>
+        <param name="Материал">ABS-пластик</param>
+        <param name="Грузоподъёмность">75</param>
+        <param name="Гарантия">24</param>
+      </offer>
+      <offer id="RS-10015" available="true">
+        <vendorCode>PIL-AERO-15</vendorCode>
+        <name>Багажник на крышу Piligrim Aero 1.5</name>
+        <vendor>Piligrim</vendor>
+        <price>10900</price>
+        <currencyId>RUR</currencyId>
+        <categoryId>101</categoryId>
+        <picture>https://cdn.roofsystems.example/piligrim/aero-15-1.jpg</picture>
+        <count>19</count>
+        <weight>4600</weight>
+        <description>Аэродинамические дуги российского производства с замками в комплекте.</description>
+        <param name="Место установки">рейлинги</param>
+        <param name="Материал">алюминий</param>
+        <param name="Профиль">аэродинамический</param>
+        <param name="Грузоподъёмность">75</param>
+        <param name="Гарантия">24</param>
+        <param name="fitment">Lada Vesta NG;Haval Jolion;Chery Tiggo 4 2021</param>
+      </offer>
+    </offers>
+  </shop>
+</yml_catalog>

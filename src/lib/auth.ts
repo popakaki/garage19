@@ -1,4 +1,5 @@
 import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { cache } from "react";
@@ -132,6 +133,32 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();
   if (!user) throw new Error("UNAUTHORIZED");
+  return user;
+}
+
+/**
+ * Для страниц личного кабинета: неавторизованного посетителя отправляем на вход,
+ * а не роняем страницу исключением. `next` возвращает пользователя на исходную страницу.
+ */
+export async function requireUserPage(nextPath?: string): Promise<SessionUser> {
+  const user = await getCurrentUser();
+  if (!user) {
+    const target = nextPath ? `/account/login?next=${encodeURIComponent(nextPath)}` : "/account/login";
+    redirect(target);
+  }
+  return user;
+}
+
+/**
+ * Для страниц админки: без прав — редирект на форму входа.
+ * (API и Server Actions используют `requireAdmin()` и обрабатывают исключение сами.)
+ */
+export async function requireAdminPage(nextPath?: string): Promise<SessionUser> {
+  const user = await getCurrentUser();
+  if (!user || (user.role !== "admin" && user.role !== "manager")) {
+    const target = nextPath ? `/admin/login?next=${encodeURIComponent(nextPath)}` : "/admin/login";
+    redirect(target);
+  }
   return user;
 }
 

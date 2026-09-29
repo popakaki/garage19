@@ -2,7 +2,19 @@
 
 import Link from "next/link";
 import { RotateCcw, X } from "lucide-react";
-import { buildCatalogHref, paramValues, useRawParams } from "@/components/catalog/catalog-params";
+import { buildCatalogHref, type RawSearchParams } from "@/components/catalog/catalog-params";
+import { paramValues } from "@/components/catalog/param-utils";
+import { useSearchParams } from "next/navigation";
+
+function useRawParams(): RawSearchParams {
+  const searchParams = useSearchParams();
+  const raw: RawSearchParams = {};
+  for (const key of new Set(searchParams.keys())) {
+    const values = searchParams.getAll(key);
+    raw[key] = values.length > 1 ? values : values[0];
+  }
+  return raw;
+}
 
 type Chip = { key: string; label: string; href: string };
 
@@ -22,11 +34,11 @@ export function ActiveFilterChips({
   const params = useRawParams();
   const chips: Chip[] = [];
 
-  const multi: { key: string; title: string; humanize?: (value: string) => string }[] = [
-    { key: "z", title: "Производитель" },
-    { key: "place", title: "Место установки" },
-    { key: "material", title: "Материал" },
-    { key: "a", title: "Характеристика", humanize: (value) => value.replace(":", ": ") },
+  const multi: { key: string; humanize?: (value: string) => string }[] = [
+    { key: "z" },
+    { key: "place" },
+    { key: "material" },
+    { key: "a", humanize: (value) => value.replace(":", ": ") },
   ];
 
   for (const group of multi) {
@@ -57,16 +69,21 @@ export function ActiveFilterChips({
     });
   }
 
-  const flags: { key: string; label: string }[] = [
+  const flags: { key: string; label: string; value?: string }[] = [
     { key: "stock", label: "Только в наличии" },
     { key: "lock", label: "С замком" },
     { key: "electric", label: "С электрикой" },
     { key: "bumper", label: "Без выреза бампера" },
     { key: "new", label: "Новинки" },
     { key: "hit", label: "Хиты" },
+    { key: "fitment", label: "Только универсальные", value: "universal" },
   ];
   for (const flag of flags) {
-    if (!paramValues(params, flag.key)[0]) continue;
+    if (flag.value) {
+      if (!paramValues(params, flag.key).includes(flag.value)) continue;
+    } else if (!paramValues(params, flag.key)[0]) {
+      continue;
+    }
     chips.push({
       key: flag.key,
       label: flag.label,

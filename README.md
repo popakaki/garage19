@@ -79,6 +79,7 @@ npm run dev                 # http://localhost:3000
 | `npm run db:seed` | Демо-данные |
 | `npm run db:studio` | Prisma Studio |
 | `npm run db:reset` | Пересоздать схему и залить демо-данные |
+| `powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1` | Production-сборка + дымовой тест 20+ страниц (флаг `-NoBuild` — без пересборки) |
 
 ## Структура
 

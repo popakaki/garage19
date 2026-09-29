@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import { resetPasswordAction } from "@/lib/actions/account";
 import { Alert, Button, Field, Input } from "@/components/ui";
 
 /** Новый пароль по ссылке сброса (токен приходит в скрытом поле). */
 export function ResetPasswordForm({ token }: { token: string }) {
-  const [state, formAction, pending] = useActionState(resetPasswordAction, {});
-
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(resetPasswordAction, {}, pathname);
   if (state?.success) {
     return (
       <Alert variant="success" title="Пароль изменён">

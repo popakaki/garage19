@@ -12,35 +12,12 @@ import { isValidPhone } from "@/lib/utils";
 /**
  * Онлайн-запись на установку (`InstallBooking`).
  *
- * Слоты простые: дата (из ближайших рабочих дней) + время из фиксированного списка.
- * Товары можно взять из корзины или перечислить вручную.
+ * Слоты простые: дата (из ближайших рабочих дней) + время из фиксированного списка
+ * (`@/lib/install-slots`). Товары можно взять из корзины или перечислить вручную.
  * Уведомления — в лог сервера с меткой `[install]`.
  */
 
 export type InstallActionState = { error?: string; success?: string };
-
-/** Часовые слоты записи (упрощённая сетка сервиса). */
-export const INSTALL_SLOTS = [
-  "09:00–11:00",
-  "11:00–13:00",
-  "13:00–15:00",
-  "15:00–17:00",
-  "17:00–19:00",
-] as const;
-
-export type InstallSlot = (typeof INSTALL_SLOTS)[number];
-
-/** Ближайшие N доступных дат (пропускаем воскресенье — сервис не работает). */
-export function nextInstallDates(count = 10, from = new Date()): string[] {
-  const dates: string[] = [];
-  const cursor = new Date(from.getFullYear(), from.getMonth(), from.getDate());
-  while (dates.length < count) {
-    cursor.setDate(cursor.getDate() + 1);
-    if (cursor.getDay() === 0) continue; // воскресенье
-    dates.push(cursor.toISOString().slice(0, 10));
-  }
-  return dates;
-}
 
 const installSchema = z.object({
   name: z.string().trim().min(2, "Укажите имя").max(120),

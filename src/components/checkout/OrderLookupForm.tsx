@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { usePathname } from "next/navigation";
 import { verifyGuestOrderAction } from "@/lib/actions/order";
 import { Alert, Button, Field, Input } from "@/components/ui";
 import { formatPhoneInput } from "@/lib/utils";
@@ -8,10 +9,11 @@ import { formatPhoneInput } from "@/lib/utils";
 /**
  * Доступ к заказу для неавторизованного покупателя: номер заказа + телефон.
  * Проверка на сервере (`verifyGuestOrderAction`), затем cookie доступа и переход
- * на страницу заказа. Форма работает и без JavaScript.
+ * на страницу заказа. Форма работает и без JavaScript (permalink).
  */
 export function OrderLookupForm({ defaultNumber = "" }: { defaultNumber?: string }) {
-  const [state, formAction, pending] = useActionState(verifyGuestOrderAction, {});
+  const pathname = usePathname();
+  const [state, formAction, pending] = useActionState(verifyGuestOrderAction, {}, pathname);
 
   return (
     <form action={formAction} className="space-y-3">

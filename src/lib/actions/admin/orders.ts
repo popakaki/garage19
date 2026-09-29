@@ -57,12 +57,8 @@ function revalidateOrder(id?: string): void {
 
 /** Смена статуса заказа + запись в историю и аудит. */
 export async function updateOrderStatusAction(_state: ActionState, formData: FormData): Promise<ActionState> {
-  return toState(await applyOrderStatus(formData));
-}
-
-async function applyOrderStatus(formData: FormData): Promise<ActionResult> {
-  return guardAction("orders", async (user) => {
-    const id = getFormString(formData, "id");
+  const id = getFormString(formData, "id");
+  const result = await guardAction("orders", async (user) => {
     const status = getFormEnum(formData, "status", ORDER_STATUS_KEYS);
     const comment = getFormOptional(formData, "comment");
 
@@ -95,19 +91,16 @@ async function applyOrderStatus(formData: FormData): Promise<ActionResult> {
     });
 
     await audit(user, "status_change", "order", id, { status: `${order.status} → ${status}`, comment });
-    revalidateOrder(id);
     return { ok: true };
   });
+  revalidateOrder(isId(id) ? id : undefined);
+  return toState(result);
 }
 
 /** Смена статуса оплаты. */
 export async function updateOrderPaymentStatusAction(_state: ActionState, formData: FormData): Promise<ActionState> {
-  return toState(await applyOrderPaymentStatus(formData));
-}
-
-async function applyOrderPaymentStatus(formData: FormData): Promise<ActionResult> {
-  return guardAction("orders", async (user) => {
-    const id = getFormString(formData, "id");
+  const id = getFormString(formData, "id");
+  const result = await guardAction("orders", async (user) => {
     const paymentStatus = getFormEnum(formData, "paymentStatus", PAYMENT_STATUS_KEYS);
 
     if (!isId(id)) return fail("Заказ не найден");
@@ -138,21 +131,16 @@ async function applyOrderPaymentStatus(formData: FormData): Promise<ActionResult
     });
 
     await audit(user, "status_change", "order", id, { paymentStatus: `${order.paymentStatus} → ${paymentStatus}` });
-    revalidateOrder(id);
     return { ok: true };
   });
+  revalidateOrder(isId(id) ? id : undefined);
+  return toState(result);
 }
 
 /** Редактирование заказа: контакты, доставка, комментарий менеджера. */
 export async function updateOrderAction(_state: ActionState, formData: FormData): Promise<ActionState> {
-  return toState(await applyOrderUpdate(formData));
-}
-
-async function applyOrderUpdate(formData: FormData): Promise<ActionResult> {
-  return guardAction("orders", async (user) => {
-    const id = getFormString(formData, "id");
-    if (!isId(id)) return fail("Заказ не найден");
-
+  const id = getFormString(formData, "id");
+  const result = await guardAction("orders", async (user) => {
     const customerName = getFormString(formData, "customerName");
     const customerPhone = getFormString(formData, "customerPhone");
     if (!customerName) return fail("Укажите имя клиента");
@@ -187,9 +175,10 @@ async function applyOrderUpdate(formData: FormData): Promise<ActionResult> {
     await audit(user, "update", "order", id, {
       managerComment: { before: order.managerComment, after: managerComment },
     });
-    revalidateOrder(id);
     return { ok: true };
   });
+  revalidateOrder(isId(id) ? id : undefined);
+  return toState(result);
 }
 
 /** Удаление заказа — только администратор. */

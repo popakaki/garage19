@@ -79,6 +79,13 @@ export function CatalogFilterSidebar({
               label="С замком (антивандальные)"
               checked={state.lock}
             />
+            <FilterCheckbox
+              basePath={basePath}
+              param="fitment"
+              value="universal"
+              label="Только универсальные"
+              checked={state.universalOnly}
+            />
           </>,
           "Фасеты «замок» и «в наличии» конкуренты почти не используют",
         )}

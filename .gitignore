@@ -44,3 +44,8 @@ pnpm-debug.log*
 # backups / exports
 /backups
 /tmp
+
+# отчёты проверок
+tsc-report.txt
+lint-report.txt
+.pgdata/

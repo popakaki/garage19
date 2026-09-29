@@ -31,14 +31,6 @@ export type { DeliveryProvider, DeliveryQuote, DeliveryRequest } from "./types";
 
 export const MOCK_MODE = (): boolean => process.env.DELIVERY_MOCK === "true";
 
-const PROVIDER_LABELS: Record<DeliveryProvider, string> = {
-  pickup: "Самовывоз",
-  cdek: "СДЭК",
-  boxberry: "Boxberry",
-  post: "Почта России",
-  own: "Собственная доставка",
-};
-
 export function isDeliveryType(value: unknown): value is DeliveryType {
   return typeof value === "string" && value in DELIVERY_TYPES;
 }
@@ -215,11 +207,6 @@ export function deliveryIntegrations(): { cdek: boolean; boxberry: boolean; post
     post: isPostConfigured(),
     mock: MOCK_MODE(),
   };
-}
-
-/** Текст-подсказка для интерфейса оформления заказа. */
-export function deliveryProviderLabel(provider: DeliveryProvider): string {
-  return PROVIDER_LABELS[provider];
 }
 
 /**

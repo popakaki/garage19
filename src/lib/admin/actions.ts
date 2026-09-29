@@ -96,7 +96,32 @@ export async function guardAction(
   }
 }
 
-/** Проверка прав для действия, которое не возвращает результат (например, вход). */
+/** Ключевые слова текста ошибки → код сообщения для редиректа. */
+const TOAST_ERROR_HINTS: { match: RegExp; code: string }[] = [
+  { match: /прав/i, code: "error.forbidden" },
+  { match: /не найден|не найдена|не существует/i, code: "error.notfound" },
+  { match: /уже (занят|есть|используется|существует)/i, code: "error.unique" },
+  { match: /ссыл|связан|нельзя удалить|заказ/i, code: "error.relation" },
+  { match: /файл|загруз/i, code: "error.upload" },
+];
+
+/** Код сообщения по тексту ошибки — для экшенов, которые отвечают редиректом. */
+export function toastCodeForError(error: string): string {
+  for (const hint of TOAST_ERROR_HINTS) {
+    if (hint.match.test(error)) return hint.code;
+  }
+  return "error.invalid";
+}
+
+/**
+ * Массовые действия и удаления отвечают редиректом, поэтому причину отказа
+ * превращаем в код сообщения через `toastCodeForError`.
+ */
+export function errorToastCode(result: ActionResult): string | null {
+  return result.ok ? null : toastCodeForError(result.error);
+}
+
+/** Проверка значения роли из формы. */
 export function isKnownRole(value: string): value is UserRole {
   return value === "customer" || value === "manager" || value === "admin";
 }

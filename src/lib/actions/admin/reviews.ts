@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { REVIEW_STATUSES } from "@/lib/constants";
 import {
   audit,
+  errorToastCode,
   fail,
   getFormEnum,
   getFormOptional,
@@ -14,6 +15,7 @@ import {
   isId,
   recalcProductRating,
   redirectWith,
+  toState,
   type ActionResult,
   type ActionState,
 } from "@/lib/admin/actions";
@@ -31,7 +33,11 @@ function revalidateReviews(productId?: string): void {
   if (productId) revalidatePath(`/admin/products/${productId}`);
 }
 
-export async function updateReviewStatusAction(formData: FormData): Promise<ActionResult> {
+export async function updateReviewStatusAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyReviewStatus(formData));
+}
+
+async function applyReviewStatus(formData: FormData): Promise<ActionResult> {
   return guardAction("reviews", async (user) => {
     const id = getFormString(formData, "id");
     const status = getFormEnum(formData, "status", REVIEW_STATUS_KEYS);
@@ -63,7 +69,7 @@ export async function bulkReviewStatusAction(formData: FormData): Promise<void> 
     .filter((value): value is string => typeof value === "string" && isId(value));
   const status = getFormString(formData, "status");
 
-  await guardAction("reviews", async (user) => {
+  const result = await guardAction("reviews", async (user) => {
     if (ids.length === 0) return fail("Выберите отзывы");
     if (!REVIEW_STATUS_KEYS.includes(status)) return fail("Выберите корректный статус");
 
@@ -81,11 +87,15 @@ export async function bulkReviewStatusAction(formData: FormData): Promise<void> 
     return { ok: true };
   });
 
-  redirectWith("/admin/reviews", "review.updated");
+  redirectWith("/admin/reviews", errorToastCode(result) ?? "review.updated");
 }
 
 /** Ответ магазина на отзыв. */
-export async function replyToReviewAction(formData: FormData): Promise<ActionResult> {
+export async function replyToReviewAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyReviewReply(formData));
+}
+
+async function applyReviewReply(formData: FormData): Promise<ActionResult> {
   return guardAction("reviews", async (user) => {
     const id = getFormString(formData, "id");
     const reply = getFormOptional(formData, "adminReply");
@@ -105,7 +115,11 @@ export async function replyToReviewAction(formData: FormData): Promise<ActionRes
   });
 }
 
-export async function deleteReviewReplyAction(formData: FormData): Promise<ActionResult> {
+export async function deleteReviewReplyAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyReviewReplyDelete(formData));
+}
+
+async function applyReviewReplyDelete(formData: FormData): Promise<ActionResult> {
   return guardAction("reviews", async (user) => {
     const id = getFormString(formData, "id");
     if (!isId(id)) return fail("Отзыв не найден");
@@ -172,14 +186,12 @@ export async function deleteReviewAction(formData: FormData): Promise<void> {
   redirectWith("/admin/reviews", "review.deleted");
 }
 
-/** Форма ответа: возвращает состояние для useActionState. */
-export async function replyToReviewStateAction(_state: ActionState, formData: FormData): Promise<ActionState> {
-  const result = await replyToReviewAction(formData);
-  return result.ok ? { ok: true } : { error: result.error };
+/** Пометка «проверенный покупатель» вручную. */
+export async function toggleReviewVerifiedAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyReviewVerifiedToggle(formData));
 }
 
-/** Пометка «проверенный покупатель» вручную. */
-export async function toggleReviewVerifiedAction(formData: FormData): Promise<ActionResult> {
+async function applyReviewVerifiedToggle(formData: FormData): Promise<ActionResult> {
   return guardAction("reviews", async (user) => {
     const id = getFormString(formData, "id");
     if (!isId(id)) return fail("Отзыв не найден");

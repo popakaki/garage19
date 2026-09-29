@@ -65,15 +65,17 @@ export function PanelCard({
   description,
   footer,
   className,
+  id,
 }: {
   children: ReactNode;
   title?: ReactNode;
   description?: ReactNode;
   footer?: ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card id={id} className={cn("scroll-mt-28 overflow-hidden", className)}>
       {(title || description) && (
         <div className="border-b border-ink-100 px-5 py-4">
           {title && <h3 className="text-base font-semibold text-ink-900">{title}</h3>}

@@ -1,12 +1,9 @@
-"use client";
-
-import { useTransition } from "react";
 import { repeatOrderAction } from "@/lib/actions/order";
 import { Button } from "@/components/ui";
 
 /**
  * «Повторить заказ»: товары из заказа добавляются в корзину Server Action.
- * Работает и без JavaScript (обычная форма), с JS — с индикацией загрузки.
+ * Обычная форма — работает и без JavaScript, после успеха сервер редиректит в корзину.
  */
 export function RepeatOrderButton({
   orderId,
@@ -19,22 +16,11 @@ export function RepeatOrderButton({
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
-  const [pending, startTransition] = useTransition();
-
   return (
-    <form
-      action={repeatOrderAction}
-      onSubmit={(event) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        startTransition(async () => {
-          await repeatOrderAction(formData);
-        });
-      }}
-    >
+    <form action={repeatOrderAction}>
       <input type="hidden" name="orderId" value={orderId} />
-      <Button type="submit" variant={variant} size={size} className={className} disabled={pending}>
-        {pending ? "Добавляем…" : "Повторить заказ"}
+      <Button type="submit" variant={variant} size={size} className={className}>
+        Повторить заказ
       </Button>
     </form>
   );

@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
-import { PRODUCT_CARD_SELECT, type ProductCard } from "@/lib/queries";
+import { getCartProductCards, type ProductCard } from "@/lib/queries";
 import { getCurrentUser } from "@/lib/auth";
 
 /**
@@ -19,7 +19,7 @@ const MAX_QTY_PER_ITEM = 99;
 export type CartCookieItem = { productId: string; qty: number };
 
 export type CartLine = {
-  product: ProductCard;
+  product: ProductCard & { weight: number | null };
   qty: number;
   total: number;
 };
@@ -88,10 +88,7 @@ export async function getCart(): Promise<CartSummary> {
     return { lines: [], count: 0, subtotal: 0, weight: 0, inStock: true };
   }
 
-  const products = await prisma.product.findMany({
-    where: { id: { in: entries.map((entry) => entry.productId) }, isActive: true },
-    select: { ...PRODUCT_CARD_SELECT, weight: true },
-  });
+  const products = await getCartProductCards(entries.map((entry) => entry.productId));
   const byId = new Map(products.map((product) => [product.id, product]));
 
   const lines: CartLine[] = [];

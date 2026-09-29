@@ -1,67 +1,90 @@
 /**
- * Адаптер к модулю импорта прайсов.
+ * Адаптер админки к модулю импорта прайсов (`src/lib/import/**`).
  *
- * Реализация импорта (`runImport`, `runImportAction`) — зона другого разработчика
- * и подключается по путям `@/lib/import` и `@/lib/import/actions`.
- * Админка вызывает импорт строго через эти пути: загрузка идёт динамически,
- * поэтому отсутствие модуля не ломает сборку и раздел импорта — задача
- * конкретного запуска завершится понятной ошибкой (см. TODO ниже).
+ * Импорт подключается СТАТИЧЕСКИ: динамический `import("@/lib/import/actions")`
+ * с `webpackIgnore` не разрешается в рантайме (alias `@/*` существует только
+ * на этапе сборки), поэтому админка показывала «модуль не подключён» при
+ * полностью рабочем импортёре. Держим только прямые импорты.
  *
- * Ожидаемый контракт:
- *   src/lib/import/index.ts   export async function runImport(formData: FormData): Promise<{ error?: string } | void>
- *   src/lib/import/actions.ts export async function runImportAction(formData: FormData): Promise<{ error?: string } | void>
- *
- * TODO(импорт): когда модуль появится, убрать динамическую подстановку пути
- * и импортировать функции статически (`import { runImport } from "@/lib/import"`).
+ * Контракт импортёра — docs/IMPORT.md.
  */
 
+import { runImport, type ImportInput, type ImportMode, type ImportSourceType } from "@/lib/import";
+import { runImportAction } from "@/lib/import/actions";
+
+/** Результат, который ожидают Server Actions админки: либо ошибка, либо «ок». */
 export type ImportActionResult = { error?: string } | void;
 
-type ImportRunner = (formData: FormData) => Promise<ImportActionResult>;
+const MODES: ImportMode[] = ["update", "insert_only", "dry_run"];
+const SOURCE_TYPES: ImportSourceType[] = ["xml", "yml", "csv"];
 
-export const IMPORT_MODULE_PATHS = {
-  runImport: "@/lib/import",
-  runImportAction: "@/lib/import/actions",
-} as const;
-
-/** Динамический импорт по рантайм-пути: не требует наличия модуля на этапе сборки. */
-const dynamicImport = (specifier: string): Promise<Record<string, unknown>> =>
-  import(/* webpackIgnore: true */ /* turbopackIgnore: true */ specifier);
-
-async function callImportModule(
-  specifier: string,
-  exportName: string,
-  formData: FormData,
-): Promise<ImportActionResult> {
-  try {
-    const module = await dynamicImport(specifier);
-    const candidate = module[exportName];
-    if (typeof candidate !== "function") {
-      return { error: `Модуль импорта не экспортирует ${exportName}` };
-    }
-    const runner = candidate as ImportRunner;
-    return await runner(formData);
-  } catch {
-    return { error: `Модуль импорта (${specifier}) пока не подключён — обратитесь к разработчику импорта` };
-  }
+function normalizeMode(value: unknown): ImportMode {
+  const mode = String(value ?? "update").trim() as ImportMode;
+  return MODES.includes(mode) ? mode : "update";
 }
 
-/** Запуск импорта через Server Action `runImportAction` из `@/lib/import/actions`. */
+function sourceTypeFromName(fileName: string): ImportSourceType {
+  const extension = fileName.split(".").pop()?.toLowerCase() ?? "";
+  if (extension === "csv") return "csv";
+  if (extension === "yml" || extension === "yaml") return "yml";
+  return "xml";
+}
+
+function normalizeSourceType(value: unknown, fileName: string): ImportSourceType {
+  const type = String(value ?? "").trim() as ImportSourceType;
+  return SOURCE_TYPES.includes(type) ? type : sourceTypeFromName(fileName);
+}
+
+/**
+ * Запуск импорта через Server Action `runImportAction`.
+ * Ожидает в FormData: `file` (File) либо `text`, `fileName`, `sourceType`,
+ * `mode`, `supplierId`, `defaultCategorySlug`, а также `jobId` — задачу
+ * `ImportJob`, созданную админкой (движок обновит её, а не создаст новую).
+ */
 export async function callRunImportAction(formData: FormData): Promise<ImportActionResult> {
-  return callImportModule(IMPORT_MODULE_PATHS.runImportAction, "runImportAction", formData);
-}
-
-/** Прямой вызов `runImport` из `@/lib/import` (повторный запуск задачи и т.п.). */
-export async function callRunImport(formData: FormData): Promise<ImportActionResult> {
-  return callImportModule(IMPORT_MODULE_PATHS.runImport, "runImport", formData);
-}
-
-/** Есть ли модуль импорта (для подсказки в интерфейсе). */
-export async function importModuleAvailable(): Promise<boolean> {
-  try {
-    const module = await dynamicImport(IMPORT_MODULE_PATHS.runImport);
-    return typeof module.runImport === "function";
-  } catch {
-    return false;
+  const result = await runImportAction(formData);
+  if (result && typeof result === "object" && "error" in result && result.error) {
+    return { error: result.error };
   }
+  return undefined;
+}
+
+/**
+ * Прямой вызов движка `runImport` (вне Server Action): используется для
+ * скриптов, крона и повторного запуска задачи по прайсу поставщика.
+ * Проверку прав выполняет вызывающая сторона (админ-экшены вызывают `requireAdmin`).
+ */
+export async function callRunImport(formData: FormData): Promise<ImportActionResult> {
+  const file = formData.get("file");
+  const fileObject = file && typeof file === "object" && "size" in file ? (file as File) : null;
+  const fileName = String(formData.get("fileName") ?? fileObject?.name ?? "").trim();
+  const textField = String(formData.get("text") ?? "").trim();
+
+  const text = textField || (fileObject ? await fileObject.text() : "");
+  if (!text) return { error: "Нет данных прайса: передайте файл или текст выгрузки" };
+
+  const input: ImportInput = {
+    text,
+    fileName: fileName || "price.xml",
+    sourceType: normalizeSourceType(formData.get("sourceType"), fileName || "price.xml"),
+    mode: normalizeMode(formData.get("mode")),
+    supplierId: String(formData.get("supplierId") ?? "").trim() || undefined,
+    userId: String(formData.get("userId") ?? "").trim() || undefined,
+    defaultCategorySlug: String(formData.get("defaultCategorySlug") ?? "").trim() || undefined,
+  };
+
+  try {
+    const result = await runImport(input);
+    if (result.status === "failed") {
+      return { error: result.errors[0] ?? "Импорт завершился с ошибкой" };
+    }
+    return undefined;
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Не удалось выполнить импорт" };
+  }
+}
+
+/** Модуль импорта подключён статически — раздел админки всегда доступен. */
+export async function importModuleAvailable(): Promise<boolean> {
+  return true;
 }

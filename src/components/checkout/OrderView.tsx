@@ -10,7 +10,7 @@ import {
   PAYMENT_TYPES,
 } from "@/lib/constants";
 import { formatDate, formatPrice, productImage } from "@/lib/utils";
-import { orderHistory } from "@/lib/actions/order";
+import { orderHistory } from "@/lib/order-history";
 import type { Order, OrderItem } from "@prisma/client";
 
 /**

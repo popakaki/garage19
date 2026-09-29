@@ -1,13 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { CallbackFab } from "@/components/forms/callback-fab";
-import { buildMetadata, organizationJsonLd } from "@/lib/seo";
 import "./globals.css";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildMetadata({ path: "/" });
-}
+/**
+ * Корневой layout: только каркас документа.
+ * Публичная обвязка (шапка, подвал, плавающая кнопка) живёт в `(site)/layout.tsx`,
+ * админка — в собственном `admin/(panel)/layout.tsx`, поэтому админ-страницы
+ * не наследуют витрину сайта.
+ */
+export const metadata: Metadata = {
+  title: {
+    default: "Garage19 — багажники, автокрепления и фаркопы",
+    template: "%s | Garage19",
+  },
+  description:
+    "Багажники на крышу, автобоксы, велокрепления, лыжные крепления и фаркопы с подбором по марке, модели и поколению автомобиля.",
+};
 
 export const viewport: Viewport = {
   themeColor: "#f97316",
@@ -15,21 +22,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = await organizationJsonLd();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
-      <body className="flex min-h-screen flex-col bg-ink-50 antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CallbackFab />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </body>
+      <body className="flex min-h-screen flex-col bg-ink-50 antialiased">{children}</body>
     </html>
   );
 }

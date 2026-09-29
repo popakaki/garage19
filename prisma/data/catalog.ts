@@ -146,7 +146,7 @@ export const CATEGORY_TREE: CategorySeed[] = [
     seoKeywords: "велокрепление, крепление для велосипеда, велобагажник, фаркопное велокрепление",
     children: [
       {
-        slug: "velokrepleniya-na-kryshu",
+        slug: "veloperekreateli-na-kryshu",
         name: "На крышу",
         icon: "Bike",
         sortOrder: 10,
@@ -157,7 +157,7 @@ export const CATEGORY_TREE: CategorySeed[] = [
         seoKeywords: "велокрепление на крышу, крепление велосипеда на крышу",
       },
       {
-        slug: "velokrepleniya-na-farkop",
+        slug: "veloperekreateli-na-farkop",
         name: "На фаркоп",
         icon: "Truck",
         sortOrder: 20,
@@ -168,7 +168,7 @@ export const CATEGORY_TREE: CategorySeed[] = [
         seoKeywords: "велокрепление на фаркоп, платформа для велосипедов на фаркоп",
       },
       {
-        slug: "velokrepleniya-na-zadnyuyu-dver",
+        slug: "veloperekreateli-na-zadnyuyu-dver",
         name: "На заднюю дверь",
         icon: "DoorOpen",
         sortOrder: 30,
@@ -194,7 +194,7 @@ export const CATEGORY_TREE: CategorySeed[] = [
     seoKeywords: "лыжное крепление, крепление для сноуборда, лыжный бокс, SnowPack",
     children: [
       {
-        slug: "lyzhi-4-pary",
+        slug: "lyzhnye-krepleniya-4-pary",
         name: "На 4 пары",
         icon: "Snowflake",
         sortOrder: 10,
@@ -204,7 +204,7 @@ export const CATEGORY_TREE: CategorySeed[] = [
         seoKeywords: "лыжное крепление 4 пары, крепление для сноуборда",
       },
       {
-        slug: "lyzhi-6-par",
+        slug: "lyzhnye-krepleniya-6-par",
         name: "На 6 пар",
         icon: "Snowflake",
         sortOrder: 20,

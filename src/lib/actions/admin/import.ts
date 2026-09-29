@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { IMPORT_MODES } from "@/lib/constants";
 import {
   audit,
+  errorToastCode,
   fail,
   getFormEnum,
   getFormOptional,
@@ -13,6 +14,7 @@ import {
   guardAction,
   isId,
   redirectWith,
+  toState,
   type ActionResult,
   type ActionState,
 } from "@/lib/admin/actions";
@@ -145,18 +147,22 @@ export async function clearFinishedImportsAction(formData: FormData): Promise<vo
     .getAll("ids")
     .filter((value): value is string => typeof value === "string" && value !== "" && isId(value));
 
-  await guardAction("import", async (user) => {
+  const result = await guardAction("import", async (user) => {
     const where = ids.length > 0 ? { id: { in: ids } } : { status: { in: ["done", "failed"] } };
-    const result = await prisma.importJob.deleteMany({ where });
-    await audit(user, "delete", "importJob", null, { removed: result.count });
+    const removed = await prisma.importJob.deleteMany({ where });
+    await audit(user, "delete", "importJob", null, { removed: removed.count });
     revalidateImport();
     return { ok: true };
   });
 
-  redirectWith("/admin/import", "import.deleted");
+  redirectWith("/admin/import", errorToastCode(result) ?? "import.deleted");
 }
 
-export async function deleteImportJobAction(formData: FormData): Promise<ActionResult> {
+export async function deleteImportJobAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyImportJobDelete(formData));
+}
+
+async function applyImportJobDelete(formData: FormData): Promise<ActionResult> {
   return guardAction("import", async (user) => {
     const id = getFormString(formData, "id");
     if (!isId(id)) return fail("Задача не найдена");

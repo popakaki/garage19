@@ -10,7 +10,6 @@ import { addToCart, clearCart, getCart } from "@/lib/cart";
 import { calculateDelivery, getInstallPrice } from "@/lib/delivery";
 import { checkoutSchema } from "@/lib/checkout-schema";
 import { PROMO_COOKIE, normalizePromoCode, resolvePromo } from "@/lib/promo";
-import { getSettings } from "@/lib/settings";
 import { ORDER_STATUSES, type DeliveryType, type PaymentType } from "@/lib/constants";
 import { formatOrderNumber, isValidPhone } from "@/lib/utils";
 
@@ -439,25 +438,4 @@ export async function repeatOrderAction(formData: FormData): Promise<void> {
   revalidatePath("/checkout");
   revalidatePath("/account/orders");
   redirect("/cart?repeated=1");
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Чтение заказов (для страниц)
-// ─────────────────────────────────────────────────────────────────────────────
-
-export type OrderStatusEntry = { status: string; at: string; comment?: string };
-
-export function orderStatusLabel(status: string): string {
-  return ORDER_STATUSES[status as keyof typeof ORDER_STATUSES] ?? status;
-}
-
-export function orderHistory(history: unknown): OrderStatusEntry[] {
-  if (!Array.isArray(history)) return [];
-  return history
-    .filter((entry): entry is OrderStatusEntry => Boolean(entry) && typeof entry === "object" && "status" in entry)
-    .map((entry) => ({
-      status: String(entry.status),
-      at: String(entry.at ?? new Date().toISOString()),
-      comment: entry.comment ? String(entry.comment) : undefined,
-    }));
 }

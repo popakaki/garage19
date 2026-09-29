@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import {
   audit,
+  errorToastCode,
   fail,
   getFormInt,
   getFormList,
@@ -12,7 +13,9 @@ import {
   guardAction,
   isId,
   redirectWith,
+  toState,
   type ActionResult,
+  type ActionState,
 } from "@/lib/admin/actions";
 
 /**
@@ -112,11 +115,12 @@ export async function createFitmentsAction(formData: FormData): Promise<void> {
 
 /** Удаление привязок по фильтру (товары × авто). */
 export async function deleteFitmentsAction(formData: FormData): Promise<void> {
-  await guardAction("compatibility", async (user) => {
+  const result = await guardAction("compatibility", async (user) => {
     const productIds = getFormList(formData, "productIds").filter(isId);
-    const brandId = getFormOptional(formData, "brandId") ?? null;
-    const modelId = getFormOptional(formData, "modelId") ?? null;
-    const generationId = getFormOptional(formData, "generationId") ?? null;
+    // Форма удаления использует префикс delete_ у полей выбора авто.
+    const brandId = getFormOptional(formData, "delete_brandId") ?? getFormOptional(formData, "brandId") ?? null;
+    const modelId = getFormOptional(formData, "delete_modelId") ?? getFormOptional(formData, "modelId") ?? null;
+    const generationId = getFormOptional(formData, "delete_generationId") ?? getFormOptional(formData, "generationId") ?? null;
     const productIdSingle = getFormString(formData, "productId");
 
     const where = {
@@ -135,11 +139,15 @@ export async function deleteFitmentsAction(formData: FormData): Promise<void> {
     return { ok: true };
   });
 
-  redirectWith("/admin/compatibility", "fitment.deleted");
+  redirectWith("/admin/compatibility", errorToastCode(result) ?? "fitment.deleted");
 }
 
 /** Удаление одной привязки (со страницы товара). */
-export async function deleteFitmentAction(formData: FormData): Promise<ActionResult> {
+export async function deleteFitmentAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyFitmentDelete(formData));
+}
+
+async function applyFitmentDelete(formData: FormData): Promise<ActionResult> {
   return guardAction("compatibility", async (user) => {
     const id = getFormString(formData, "id");
     if (!isId(id)) return fail("Привязка не найдена");
@@ -153,7 +161,11 @@ export async function deleteFitmentAction(formData: FormData): Promise<ActionRes
 }
 
 /** Быстрая привязка одного товара к марке (из карточки товара). */
-export async function addProductFitmentAction(formData: FormData): Promise<ActionResult> {
+export async function addProductFitmentAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  return toState(await applyProductFitment(formData));
+}
+
+async function applyProductFitment(formData: FormData): Promise<ActionResult> {
   return guardAction("compatibility", async (user) => {
     const productId = getFormString(formData, "productId");
     const brandId = getFormString(formData, "brandId");
